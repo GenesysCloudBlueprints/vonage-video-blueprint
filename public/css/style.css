@@ -1,0 +1,14 @@
+body {
+    background-color: #5f6062 !important;
+}
+
+#publisher {
+    width: 500px;
+    height: 500px;
+}
+
+.jumbotron {
+    padding: 7px !important;
+    background-color: #293840 !important;
+    color: #fff;
+}
