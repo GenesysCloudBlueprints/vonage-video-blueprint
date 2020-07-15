@@ -1,5 +1,5 @@
 body {
-    background-color: #5f6062 !important;
+    /* background-color: #5f6062 !important; */
 }
 
 #publisher {
@@ -9,6 +9,12 @@ body {
 
 .jumbotron {
     padding: 7px !important;
-    background-color: #293840 !important;
+    background-color: #FF4F1F !important;
     color: #fff;
+}
+
+iframe {
+    height: -webkit-fill-available;
+    width: -webkit-fill-available;
+    border: none !important;
 }

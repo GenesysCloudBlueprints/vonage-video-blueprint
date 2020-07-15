@@ -59,6 +59,10 @@ app.use(express.static(__dirname + '/public')); //
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+app.get('/', async (req, res) => {
+    res.render('index.ejs');
+});
+
 // Create a session if not yet created
 app.get('/room/:conversation_id', async (req, res) => {
     let conversation_id = req.params.conversation_id;
@@ -84,7 +88,7 @@ app.get('/room/:conversation_id', async (req, res) => {
                     data: userName
                 });
 
-        res.render('index.ejs', {
+        res.render('room.ejs', {
             apiKey: apiKey,
             sessionId: sessionId,
             token: token,
@@ -103,7 +107,7 @@ client.loginClientCredentialsGrant(
     config.genesysCloud.clientSecret
 )
 .then(()=> {
-    console.log('PureCloud client credentials grant succeeded.')
+    console.log('Genesys Cloud client credentials grant succeeded.')
 })
 .catch((err) => {
     console.log(err);
