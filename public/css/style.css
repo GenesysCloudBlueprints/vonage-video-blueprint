@@ -18,3 +18,43 @@ iframe {
     width: -webkit-fill-available;
     border: none !important;
 }
+
+h1, .send-url-button {
+    margin-left: 60px;
+}
+
+#publisher, #subscribers {
+    margin: 20px;
+}
+
+#interaction-details {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.send-url-button button{
+    background-color:#FF4F1F; 
+    border-color:#FF4F1F; 
+    border-radius:25px; 
+    color: #FDFDFD; 
+    border-width: 2px;
+    border: 2px solid #FF4F1F;    
+}
+
+.send-url-button button:hover {
+    background-color:white; 
+    border-color:#FF4F1F; 
+    border-radius:25px; 
+    color: #FF4F1F; 
+    border-width: 2px;
+    border: 2px solid #FF4F1F;    
+}
+
+.send-url-button button:focus {
+    box-shadow: 0 0 0 0 !important;
+    border-color: #FF4F1F !important;
+    outline: none !important;
+} 

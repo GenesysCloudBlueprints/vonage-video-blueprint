@@ -23,31 +23,90 @@ function registerConversation(conversationId){
 }
 
 /**
- * Get current active chat conversations
- * @returns {Promise} 
+ * Subscribes the conversation to the notifications channel
+ * @param {String} conversationId 
+ * @returns {Promise}
  */
-function processActiveChats(){
+function subscribeChatConversation(conversationId){
+    return controller.addSubscription(
+        `v2.conversations.chats.${conversationId}.messages`,
+        onMessage);
+}
+
+/**
+ * Callback function for 'message' and 'typing-indicator' events.
+ * For this sample, it will merely get chat communication ID.
+ * 
+ * @param {Object} data the event data  
+ */
+let onMessage = (data) => {
+    switch(data.metadata.type){
+        case 'typing-indicator':
+            break;
+        case 'message':
+            // Values from the event
+            let eventBody = data.eventBody;
+            let convId = eventBody.conversation.id;
+            let senderId = eventBody.sender.id;
+
+            // Conversation values for cross reference
+            let conversation = activeConversations.find(c => c.id == convId);
+            let participant = conversation.participants.find(p => p.chats[0].id == senderId);
+            let purpose = participant.purpose;
+            let username;
+            let agentID;
+            
+            // Get agent communication ID
+            if(purpose == 'agent') {
+                agentID = senderId;
+            } else {
+                let agent = conversation.participants.find(p => p.purpose == 'agent');
+                agentID = agent.chats[0].id;
+
+                let customerName = participant.name;
+                username = customerName.replace(/\s/g, '%20');
+            }
+
+            view.showVideoURLButton(username, convId, agentID);
+
+            break;
+    }
+};
+
+/**
+ * Get current active chat conversations
+ * @param {String} agentName Name of the agent
+ * @returns {String} agentName Name of the agent
+ */
+function processActiveChats(agentName){
     return conversationsApi.getConversationsChats()
     .then((data) => {
-        let promiseArr = [];
-
-        data.entities.forEach((conv) => {
-            view.showIframe(conv.id);
-            promiseArr.push(registerConversation(conv.id));
-        });
+        let promiseArr = [];        
 
         if(data.entities.length == 0) {
-            view.displayInteractionDetails("You do not have an active interaction.");
+            view.displayInteractionDetails("No active interaction.");
+        } else {
+            let customerParticipant = data.entities[0].participants.find(
+                p => p.purpose == 'customer');
+
+            data.entities.forEach((conv) => {
+                view.showIframe(conv.id, agentName);
+                promiseArr.push(registerConversation(conv.id));
+                subscribeChatConversation(conv.id);
+            });
+
+            view.displayInteractionDetails(customerParticipant.name);
         }
 
-        return Promise.all(promiseArr);
+        return agentName;
     })
 }
 
 /**
  * Set-up the channel for chat conversations
+ *  @param {String} agentName Name of the agent
  */
-function setupChatChannel(){
+function setupChatChannel(agentName){
     return controller.createChannel()
     .then(data => {
         // Subscribe to incoming chat conversations
@@ -73,14 +132,16 @@ function setupChatChannel(){
                     // Add conversationid to existing conversations array
                     return registerConversation(conversation.id)
                     .then(() => {
-                        view.showIframe(conversationId);
+                        view.showIframe(conversationId, agentName);
                         view.displayInteractionDetails(customerParticipant.name);
+
+                        return subscribeChatConversation(conversationId);
                     })
                 }
 
                 // If agent has multiple interactions, open session for the active chat
                 if(agentParticipant.held == false){
-                    view.showIframe(conversationId);
+                    view.showIframe(conversationId, agentName);
                     view.displayInteractionDetails(customerParticipant.name);
                 }
 
@@ -106,12 +167,11 @@ client.loginImplicitGrant(
 }).then(userMe => {
     userId = userMe.id;
 
-    // Create the channel for chat notifications
-    return setupChatChannel();
-}).then(data => { 
-    
     // Get current chat conversations
-    return processActiveChats();
+    return processActiveChats(userMe.name);
+}).then(agentName => { 
+    // Create the channel for chat notifications
+    return setupChatChannel(agentName);
 }).then(data => {
     console.log('Finished Setup');
 

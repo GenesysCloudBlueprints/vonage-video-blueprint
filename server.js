@@ -73,7 +73,6 @@ app.get('/room/:conversation_id', async (req, res) => {
 
     if(!conversationActive && !config.testMode){
         // If conversation has ended or invalid, show the error page
-
         res.render('invalid-room.ejs', {});
     }else{
         // Create room if none created for conversation yet.
