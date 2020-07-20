@@ -1,7 +1,3 @@
-body {
-    /* background-color: #5f6062 !important; */
-}
-
 #publisher {
     width: 500px;
     height: 500px;
@@ -19,7 +15,7 @@ iframe {
     border: none !important;
 }
 
-h1, .send-url-button {
+h1 {
     margin-left: 60px;
 }
 
@@ -35,25 +31,24 @@ h1, .send-url-button {
     margin-left: auto;
 }
 
-.send-url-button button{
-    background-color:#FF4F1F; 
-    border-color:#FF4F1F; 
-    border-radius:25px; 
-    color: #FDFDFD; 
-    border-width: 2px;
-    border: 2px solid #FF4F1F;    
-}
-
-.send-url-button button:hover {
+#btnShareScreenStart, #btnShareScreenStop, #btnSendURL {
     background-color:white; 
     border-color:#FF4F1F; 
     border-radius:25px; 
     color: #FF4F1F; 
     border-width: 2px;
-    border: 2px solid #FF4F1F;    
+    border: 2px solid #FF4F1F;
 }
 
-.send-url-button button:focus {
+#btnShareScreenStart:hover, #btnShareScreenStop:hover, #btnSendURL:hover {
+    background-color:#FF4F1F; 
+    border-color:#FF4F1F; 
+    border-radius:25px; 
+    color: #FDFDFD; 
+    border-width: 2px;
+}
+
+#btnShareScreenStart:focus, #btnShareScreenStop:focus, #btnSendURL:focus {
     box-shadow: 0 0 0 0 !important;
     border-color: #FF4F1F !important;
     outline: none !important;

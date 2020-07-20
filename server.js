@@ -64,7 +64,7 @@ app.get('/', async (req, res) => {
 });
 
 // Create a session if not yet created
-app.get('/room/:conversation_id', async (req, res) => {
+app.get('/room/agent/:conversation_id', async (req, res) => {
     let conversation_id = req.params.conversation_id;
     let userName = req.query.username || 'N/A';
     let sessionId = sessions[conversation_id];
@@ -87,7 +87,40 @@ app.get('/room/:conversation_id', async (req, res) => {
                     data: userName
                 });
 
-        res.render('room.ejs', {
+        res.render('agent-room.ejs', {
+            apiKey: apiKey,
+            sessionId: sessionId,
+            token: token,
+            userName: userName
+        });
+    }
+});
+
+// Create room for customer participant
+app.get('/room/customer/:conversation_id', async (req, res) => {
+    let conversation_id = req.params.conversation_id;
+    let userName = req.query.username || 'N/A';
+    let sessionId = sessions[conversation_id];
+
+    let conversationActive = await checkConversationActive(conversation_id);
+
+    if(!conversationActive && !config.testMode){
+        // If conversation has ended or invalid, show the error page
+        res.render('invalid-room.ejs', {});
+    }else{
+        // Create room if none created for conversation yet.
+        if(!sessions[conversation_id]){
+            sessionId = await createSession();
+            sessions[conversation_id] = sessionId;
+        }
+
+        let token = opentok.generateToken(
+                sessionId, 
+                {
+                    data: userName
+                });
+
+        res.render('customer-room.ejs', {
             apiKey: apiKey,
             sessionId: sessionId,
             token: token,

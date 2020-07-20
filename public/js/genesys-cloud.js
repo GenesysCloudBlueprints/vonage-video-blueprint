@@ -53,17 +53,22 @@ let onMessage = (data) => {
             let conversation = activeConversations.find(c => c.id == convId);
             let participant = conversation.participants.find(p => p.chats[0].id == senderId);
             let purpose = participant.purpose;
+            let customerName;
             let username;
             let agentID;
             
             // Get agent communication ID
             if(purpose == 'agent') {
                 agentID = senderId;
+
+                let customer = conversation.participants.find(p => p.purpose == 'customer');
+                customerName = customer.name;
+                username = customerName.replace(/\s/g, '%20');
             } else {
                 let agent = conversation.participants.find(p => p.purpose == 'agent');
                 agentID = agent.chats[0].id;
 
-                let customerName = participant.name;
+                customerName = participant.name;
                 username = customerName.replace(/\s/g, '%20');
             }
 
@@ -148,6 +153,8 @@ function setupChatChannel(agentName){
                 // If chat has ended display meeting has ended
                 if(agentParticipant.state == 'disconnected' && isExisting){
                     view.displayInteractionDetails("This meeting has ended");
+                    view.hideIframe();
+                    view.removeVideURLButton();
                 }
             });
     });

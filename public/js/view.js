@@ -18,7 +18,14 @@ export default {
      * @param {String} username Name of the participant
      */
     showIframe(conversationId, username){
-        document.getElementById("room-container").src = '/room/' + conversationId + '?username=' + username;
+        document.getElementById("room-container").src = '/room/agent/' + conversationId + '?username=' + username;
+    },
+
+    /**
+     * Hides the OpenTok iframe that displays meeting rooms
+     */
+    hideIframe(){
+        document.getElementById("room-container").src = '';
     },
 
     /**
@@ -36,20 +43,23 @@ export default {
      * @param {String} communicationId Agent participant ID
      */
     showVideoURLButton(userName, conversationId, communicationId){
-        var elementExists = !!document.getElementById("send-url-button");
+        var elementExists = !!document.getElementById("room-container").contentWindow.document.getElementById("btnSendURL");
 
         if(!elementExists) {
             var sendURL = document.createElement("button");
+            sendURL.id = "btnSendURL";
             sendURL.innerHTML = 'Send Video URL';
             sendURL.addEventListener('click', function(event) {
-                sendMessage('https://localhost/room/' + conversationId + '?uername=' + userName, conversationId, communicationId);
+                sendMessage('https://localhost/room/customer/' + conversationId + '?username=' + userName, conversationId, communicationId);
             });
-
-            var sendURLContainer = document.createElement("div");
-            sendURLContainer.appendChild(sendURL);
-            sendURLContainer.id = "send-url-button";
-            sendURLContainer.className = "send-url-button";
-            document.getElementById("interaction-details").appendChild(sendURLContainer);
+            document.getElementById("room-container").contentWindow.document.getElementById("button-container").appendChild(sendURL);
         }        
+    },
+
+    /**
+     * Removes the Send Video URL Button
+     */
+    removeVideURLButton(){
+        document.getElementById("btnSendURL").remove();
     }
 }
