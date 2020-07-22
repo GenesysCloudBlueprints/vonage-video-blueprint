@@ -59,7 +59,7 @@ export default {
     /**
      * Removes the Send Video URL Button
      */
-    removeVideURLButton(){
-        document.getElementById("btnSendURL").remove();
+    removeVideoURLButton(){
+        document.getElementById("room-container").contentWindow.document.getElementById("btnSendURL").remove();
     }
 }

@@ -19,7 +19,7 @@ let activeConversations = [];
  */
 function registerConversation(conversationId){
     return conversationsApi.getConversation(conversationId)
-        .then((data) => activeConversations.push(data));
+    .then((data) => activeConversations.push(data));
 }
 
 /**
@@ -31,6 +31,24 @@ function subscribeChatConversation(conversationId){
     return controller.addSubscription(
         `v2.conversations.chats.${conversationId}.messages`,
         onMessage);
+}
+
+/**
+ * Add OpenTok Session ID in conversation notes
+ * @param {String} conversationId 
+ * @param {String} participantId 
+ */
+function patchConversation(conversationId, participantId){
+    let sessionId = document.getElementById('room-container').contentWindow['sessionId'];
+
+    let body = {'wrapup' : {
+                        'code' : '',
+                        'name' : '',
+                        'notes' : 'OpenTok Session ID: ' + sessionId
+                    }
+                };
+
+    return conversationsApi.patchConversationParticipant(conversationId, participantId, body);
 }
 
 /**
@@ -152,9 +170,18 @@ function setupChatChannel(agentName){
 
                 // If chat has ended display meeting has ended
                 if(agentParticipant.state == 'disconnected' && isExisting){
-                    view.displayInteractionDetails("This meeting has ended");
+                    // Remove Conversation ID in the activeConversations array
+                    let index = activeConversations.indexOf(conversationId);
+                    if (index > -1) {
+                        activeConversations.splice(index, 1);
+                    }
+
+                    // Add OpenTok Session ID in conversation notes
+                    patchConversation(conversationId, customerParticipant.id);
+
+                    // view.removeVideoURLButton();
                     view.hideIframe();
-                    view.removeVideURLButton();
+                    view.displayInteractionDetails("This meeting has ended");
                 }
             });
     });
