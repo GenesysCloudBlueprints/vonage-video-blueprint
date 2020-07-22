@@ -10,6 +10,8 @@ const usersApi = new platformClient.UsersApi();
 const conversationsApi = new platformClient.ConversationsApi();
 
 let userId = '';
+let currentConversation = null;
+let customerName = ''; 
 let activeConversations = [];
 
 /**
@@ -71,8 +73,6 @@ let onMessage = (data) => {
             let conversation = activeConversations.find(c => c.id == convId);
             let participant = conversation.participants.find(p => p.chats[0].id == senderId);
             let purpose = participant.purpose;
-            let customerName;
-            let username;
             let agentID;
             
             // Get agent communication ID
@@ -81,16 +81,12 @@ let onMessage = (data) => {
 
                 let customer = conversation.participants.find(p => p.purpose == 'customer');
                 customerName = customer.name;
-                username = customerName.replace(/\s/g, '%20');
             } else {
                 let agent = conversation.participants.find(p => p.purpose == 'agent');
                 agentID = agent.chats[0].id;
 
                 customerName = participant.name;
-                username = customerName.replace(/\s/g, '%20');
             }
-
-            view.showVideoURLButton(username, convId, agentID);
 
             break;
     }
@@ -107,7 +103,7 @@ function processActiveChats(agentName){
         let promiseArr = [];        
 
         if(data.entities.length == 0) {
-            view.displayInteractionDetails("No active interaction.");
+            view.showErrorIframe('No Active Interaction');
         } else {
             let customerParticipant = data.entities[0].participants.find(
                 p => p.purpose == 'customer');
@@ -117,8 +113,6 @@ function processActiveChats(agentName){
                 promiseArr.push(registerConversation(conv.id));
                 subscribeChatConversation(conv.id);
             });
-
-            view.displayInteractionDetails(customerParticipant.name);
         }
 
         return agentName;
@@ -156,7 +150,6 @@ function setupChatChannel(agentName){
                     return registerConversation(conversation.id)
                     .then(() => {
                         view.showIframe(conversationId, agentName);
-                        view.displayInteractionDetails(customerParticipant.name);
 
                         return subscribeChatConversation(conversationId);
                     })
@@ -165,7 +158,6 @@ function setupChatChannel(agentName){
                 // If agent has multiple interactions, open session for the active chat
                 if(agentParticipant.held == false){
                     view.showIframe(conversationId, agentName);
-                    view.displayInteractionDetails(customerParticipant.name);
                 }
 
                 // If chat has ended display meeting has ended
@@ -181,11 +173,71 @@ function setupChatChannel(agentName){
 
                     // view.removeVideoURLButton();
                     view.hideIframe();
-                    view.displayInteractionDetails("This meeting has ended");
+                    view.showErrorIframe('This meeting has ended');
                 }
             });
     });
 }
+
+/**
+ * Send the link to the room in the chat if interaction is chat.
+ */
+function sendLinkToChat(){
+    // Determine if the conversation is a chat by checking 'chats' 
+    // property of the agent participant
+
+    // TODO: Getting current conversation should be done in a different manner,
+    // right now just get the last activeCOnversation,
+    currentConversation = activeConversations[activeConversations.length - 1];
+    
+    let conversationId = currentConversation.id
+    let communicationId = '';
+
+    view.showInfoModal('Sending Link...', false);
+
+    return conversationsApi.getConversation(conversationId)
+    .then((data) => {
+        let agentParticipant = data.participants.find(p => 
+            p.purpose == 'agent');
+
+        
+        if(!agentParticipant || !agentParticipant.chats) {
+            view.showInfoModal('Sorry. This conversation is not a Webchat.');
+            return null;
+        }        
+        let chats = agentParticipant.chats;
+
+        // Get last id just in case there are multiple
+        communicationId = chats[chats.length - 1].id;
+
+        return conversationsApi.postConversationsChatCommunicationMessages(
+            conversationId,
+            communicationId,
+            {
+                body: `Please join my Vonage Video Room at: https://localhost/room/customer/${conversationId}?username=${encodeURIComponent(customerName)}`,
+                bodyType: 'standard'
+            }
+        )
+    })
+    .then((success) => {
+        if(success){
+            view.showInfoModal('Successfully sent!');
+        }
+    })
+    .catch(e => console.error(e));
+
+}   
+
+
+/** --------------------------------------------------------------
+ *                       EVENT HANDLERS
+ * -------------------------------------------------------------- */
+document.getElementById('btn-email')
+    .addEventListener('click', () => view.showEmailModal());
+document.getElementById('btn-sms')
+    .addEventListener('click', () => view.showSMSModal());
+document.getElementById('btn-chat')
+    .addEventListener('click', () => sendLinkToChat());
 
 /** --------------------------------------------------------------
  *                       INITIAL SETUP
@@ -208,6 +260,7 @@ client.loginImplicitGrant(
     return setupChatChannel(agentName);
 }).then(data => {
     console.log('Finished Setup');
+    view.showAgentControls();
 
 // Error Handling
 }).catch(e => console.log(e));

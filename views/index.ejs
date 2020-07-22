@@ -4,24 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <%- include('common/styles'); -%>
   
   <script src="https://sdk-cdn.mypurecloud.com/javascript/62.0.0/purecloud-platform-client-v2.min.js"></script>
   <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
-  <script type="module"  src="/js/genesys-cloud.js"></script>
+  <script type="module"  src="/js/index/genesys-cloud.js"></script>
 </head>
 <body>
-  <div class="jumbotron jumbotron-fluid">
-    <div class="container">
-      Vonage Room
+  <iframe id="room-container"></iframe> 
+
+  <!-- MODALS -->
+  <!-- Email Modal -->
+  <div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="emailModalLabel">Send Room Link via Email</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="inputEmail">Email address</label>
+                <input type="email" class="form-control" id="inputEmail" placeholder="name@example.com">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button id="btn-send-email" type="button" class="btn btn-primary">Send</button>
+        </div>
+        </div>
     </div>
   </div>
 
-  <div id="interaction-details">
-    <h1 id="interaction-message"></h1>
+  <!-- SMS Modal -->
+  <div class="modal fade" id="smsModal" tabindex="-1" role="dialog" aria-labelledby="smsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="smsModalLabel">Send Room Link via SMS</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="inputEmail">Phone Number</label>
+                <input type="tel" class="form-control" id="inputSMS" placeholder="+15553170000">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button id="btn-send-email" type="button" class="btn btn-primary">Send</button>
+        </div>
+        </div>
+    </div>
   </div>
 
-  <iframe id="room-container"></iframe> 
+  <!-- Miscellaneous Info -->
+  <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p id="infoModalText" class="text-center"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Contorls -->
+  <div id="agent-controls">
+    <div class="container">
+      <span>Send Room Link: </span>
+      <button id="btn-email" type="button" class="btn btn-light">Email</button>
+      <button id="btn-sms" type="button" class="btn btn-light">SMS</button>
+      <button id="btn-chat" type="button" class="btn btn-light">Chat</button>
+    </div>
+  </div>
 </body>
 </html>

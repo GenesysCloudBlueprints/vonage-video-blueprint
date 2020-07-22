@@ -73,7 +73,7 @@ app.get('/room/agent/:conversation_id', async (req, res) => {
 
     if(!conversationActive && !config.testMode){
         // If conversation has ended or invalid, show the error page
-        res.render('invalid-room.ejs', {});
+        res.render('error.ejs', {});
     }else{
         // Create room if none created for conversation yet.
         if(!sessions[conversation_id]){
@@ -106,7 +106,7 @@ app.get('/room/customer/:conversation_id', async (req, res) => {
 
     if(!conversationActive && !config.testMode){
         // If conversation has ended or invalid, show the error page
-        res.render('invalid-room.ejs', {});
+        res.render('error.ejs', {});
     }else{
         // Create room if none created for conversation yet.
         if(!sessions[conversation_id]){
@@ -128,6 +128,13 @@ app.get('/room/customer/:conversation_id', async (req, res) => {
         });
     }
 });
+
+// Error page. For Testing only
+if(config.testMode){
+    app.get('/error', (req, res) => {
+        res.render('error.ejs', {});
+    });
+}
 
 httpsServer.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);

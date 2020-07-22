@@ -53,3 +53,18 @@ h1 {
     border-color: #FF4F1F !important;
     outline: none !important;
 } 
+
+#agent-controls {
+    display: none;
+    background: #333;
+    color: #fff;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 10px 0px;
+    font-size: 1.2em;
+}
+
+#infoModalText{
+    margin-top: 18px;
+}
