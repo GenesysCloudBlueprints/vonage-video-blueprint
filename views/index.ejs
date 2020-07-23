@@ -11,7 +11,19 @@
   <script type="module"  src="/js/index/genesys-cloud.js"></script>
 </head>
 <body>
-  <iframe id="room-container"></iframe> 
+  <%- include('common/header'); -%>
+
+  <!-- Tabs for the conversation rooms-->
+  <ul class="nav nav-tabs justify-content-center" 
+      id="conversations-tab" 
+      role="tablist"
+  >
+  </ul>
+  <div class="tab-content" id="conversation-iframes">
+  </div>
+
+  <!-- Iframe for the error page -->
+  <iframe id="error-iframe"></iframe>
 
   <!-- MODALS -->
   <!-- Email Modal -->
@@ -82,5 +94,23 @@
       <button id="btn-chat" type="button" class="btn btn-light">Chat</button>
     </div>
   </div>
+
+
+  <!-- Templates -->
+  <template id="tab-template">
+    <li class="nav-item">
+      <a class="nav-link">
+      </a>
+    </li>
+  </template>
+
+  <template id="room-template">
+    <div class="tab-pane fade">
+      <div class="container text-center">
+        <button type="button" class="btn btn-dark btn-start-room">Start a Vonage Room</button>
+      </div>
+      <iframe class="room-iframe"></iframe>
+    </div>
+  </template>
 </body>
 </html>

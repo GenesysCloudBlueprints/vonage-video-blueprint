@@ -9,30 +9,55 @@ const client = platformClient.ApiClient.instance;
 const usersApi = new platformClient.UsersApi();
 const conversationsApi = new platformClient.ConversationsApi();
 
-let userId = '';
+let userMe = null;
 let currentConversation = null;
-let customerName = ''; 
 let activeConversations = [];
+// array of conv ids that are currently in the process of registering.
+// helps debounce when multiple duplicate notifications come in.
+let inProcessConversations = []; 
 
 /**
- * Should be called when there's a new conversation. 
- * Will store the conversations in a global array.
+ * Add conversation to global activeConversatoins and 
+ * add it to the page in the navbar
  * @param {String} conversationId Genesys Cloud conversationId
  */
 function registerConversation(conversationId){
+    // If already in process then ignore
+    if(inProcessConversations.find(id => id == conversationId)) return;
+    inProcessConversations.push(conversationId);
+    
+    view.hideErrorIframe();
+
     return conversationsApi.getConversation(conversationId)
-    .then((data) => activeConversations.push(data));
+    .then((data) => {
+        addConversationAsTab(data);
+        activeConversations.push(data);
+
+        // Remove from inprocess
+        let idx = inProcessConversations.findIndex(id => id == conversationId);
+        inProcessConversations.splice(idx, 1);
+    });
 }
 
 /**
- * Subscribes the conversation to the notifications channel
- * @param {String} conversationId 
- * @returns {Promise}
+ * Remove conversation from global activeConversatoins and 
+ * add remove from navbar
+ * @param {String} conversationId Genesys Cloud conversationId
  */
-function subscribeChatConversation(conversationId){
-    return controller.addSubscription(
-        `v2.conversations.chats.${conversationId}.messages`,
-        onMessage);
+function deregisterConversation(conversationId){
+    // If already in process then ignore
+    if(inProcessConversations.find(id => id == conversationId)) return;
+    inProcessConversations.push(conversationId);
+
+    let index = activeConversations.indexOf(conversationId);
+    if (index > -1) {
+        activeConversations.splice(index, 1);
+    }
+    view.removeRoom(conversationId);
+
+    // Remove from inprocess
+    let idx = inProcessConversations.findIndex(id => id == conversationId);
+    inProcessConversations.splice(idx, 1);
 }
 
 /**
@@ -40,8 +65,9 @@ function subscribeChatConversation(conversationId){
  * @param {String} conversationId 
  * @param {String} participantId 
  */
-function patchConversation(conversationId, participantId){
-    let sessionId = document.getElementById('room-container').contentWindow['sessionId'];
+function patchConversation(conversationId, participantId, sessionId){
+    // Just return if no session started in vonage
+    if(!sessionId) return;
 
     let body = {'wrapup' : {
                         'code' : '',
@@ -54,84 +80,67 @@ function patchConversation(conversationId, participantId){
 }
 
 /**
- * Callback function for 'message' and 'typing-indicator' events.
- * For this sample, it will merely get chat communication ID.
- * 
- * @param {Object} data the event data  
+ * Get Vonage session assosciated witht he conversation
+ * @param {String} conversationId 
  */
-let onMessage = (data) => {
-    switch(data.metadata.type){
-        case 'typing-indicator':
-            break;
-        case 'message':
-            // Values from the event
-            let eventBody = data.eventBody;
-            let convId = eventBody.conversation.id;
-            let senderId = eventBody.sender.id;
+function getSessionId(conversationId){
+    let sessionId = null;
+    let iframeContainer = document.getElementById(`${conversationId}-room`)
 
-            // Conversation values for cross reference
-            let conversation = activeConversations.find(c => c.id == convId);
-            let participant = conversation.participants.find(p => p.chats[0].id == senderId);
-            let purpose = participant.purpose;
-            let agentID;
-            
-            // Get agent communication ID
-            if(purpose == 'agent') {
-                agentID = senderId;
-
-                let customer = conversation.participants.find(p => p.purpose == 'customer');
-                customerName = customer.name;
-            } else {
-                let agent = conversation.participants.find(p => p.purpose == 'agent');
-                agentID = agent.chats[0].id;
-
-                customerName = participant.name;
-            }
-
-            break;
+    // Get session ID if it still exists
+    if(iframeContainer){
+        let roomIframe = iframeContainer.querySelectorAll('iframe')[0];
+        sessionId = roomIframe.contentWindow['sessionId'];
     }
-};
+    
+    return sessionId;
+}
 
 /**
  * Get current active chat conversations
- * @param {String} agentName Name of the agent
- * @returns {String} agentName Name of the agent
  */
-function processActiveChats(agentName){
-    return conversationsApi.getConversationsChats()
+function processActiveConversations(){
+    return conversationsApi.getConversations()
     .then((data) => {
         let promiseArr = [];        
 
         if(data.entities.length == 0) {
             view.showErrorIframe('No Active Interaction');
         } else {
-            let customerParticipant = data.entities[0].participants.find(
-                p => p.purpose == 'customer');
-
             data.entities.forEach((conv) => {
-                view.showIframe(conv.id, agentName);
                 promiseArr.push(registerConversation(conv.id));
-                subscribeChatConversation(conv.id);
             });
         }
-
-        return agentName;
     })
 }
 
 /**
- * Set-up the channel for chat conversations
- *  @param {String} agentName Name of the agent
+ * Add the conversation into the page as a tab
+ * @param {Object} conversation 
  */
-function setupChatChannel(agentName){
+function addConversationAsTab(conversation){
+    let customer = conversation.participants.find(p => p.purpose == 'customer');
+    let tabName = customer.name ? customer.name : 'Conversation';
+
+    view.addRoom(conversation.id, tabName, userMe.name, () => {
+        // When tab is clicked switch the active conversation to this one
+        currentConversation = conversation;
+    });
+}
+
+/**
+ * Set-up the channel for conversations
+ */
+function setupChannel(){
     return controller.createChannel()
     .then(data => {
-        // Subscribe to incoming chat conversations
+        // Subscribe to conversation notifications
         return controller.addSubscription(
-            `v2.users.${userId}.conversations.chats`,
+            `v2.users.${userMe.id}.conversations`,
 
-            // Called when a chat conversation event fires (connected to agent, etc.)
+            // Callback function
             (data) => {
+                console.log(data);
                 let conversation = data.eventBody;
                 let participants = conversation.participants;
                 let conversationId = conversation.id;
@@ -145,35 +154,25 @@ function setupChatChannel(agentName){
                                     .indexOf(conversationId) != -1;
 
                 // Once agent is connected, create a room and a session
-                if(agentParticipant.state == 'connected' && !isExisting){
+                if(agentParticipant.connectedTime && 
+                        !agentParticipant.endTime && 
+                        !isExisting
+                    ){
                     // Add conversationid to existing conversations array
-                    return registerConversation(conversation.id)
-                    .then(() => {
-                        view.showIframe(conversationId, agentName);
-
-                        return subscribeChatConversation(conversationId);
-                    })
-                }
-
-                // If agent has multiple interactions, open session for the active chat
-                if(agentParticipant.held == false){
-                    view.showIframe(conversationId, agentName);
+                    return registerConversation(conversationId);
                 }
 
                 // If chat has ended display meeting has ended
-                if(agentParticipant.state == 'disconnected' && isExisting){
-                    // Remove Conversation ID in the activeConversations array
-                    let index = activeConversations.indexOf(conversationId);
-                    if (index > -1) {
-                        activeConversations.splice(index, 1);
-                    }
-
+                if(agentParticipant.endTime && isExisting){
                     // Add OpenTok Session ID in conversation notes
-                    patchConversation(conversationId, customerParticipant.id);
+                    let sessionId = getSessionId(conversationId);
+                    
+                    deregisterConversation(conversationId)
 
-                    // view.removeVideoURLButton();
-                    view.hideIframe();
-                    view.showErrorIframe('This meeting has ended');
+                    if(sessionId){
+                        patchConversation(conversationId, customerParticipant.id, sessionId)
+                        .catch(e => console.error(e));
+                    }
                 }
             });
     });
@@ -183,24 +182,23 @@ function setupChatChannel(agentName){
  * Send the link to the room in the chat if interaction is chat.
  */
 function sendLinkToChat(){
-    // Determine if the conversation is a chat by checking 'chats' 
-    // property of the agent participant
-
-    // TODO: Getting current conversation should be done in a different manner,
-    // right now just get the last activeCOnversation,
-    currentConversation = activeConversations[activeConversations.length - 1];
-    
     let conversationId = currentConversation.id
     let communicationId = '';
 
-    view.showInfoModal('Sending Link...', false);
+    view.showInfoModal('Sending Link...');
 
+    // Check if the conversation is chat, if not show a message
     return conversationsApi.getConversation(conversationId)
     .then((data) => {
+        let customerParticipant = data.participants.find(p => 
+            p.purpose == 'customer');
         let agentParticipant = data.participants.find(p => 
             p.purpose == 'agent');
+        let customerName = customerParticipant.name || '<No Name>';
 
-        
+
+        // Determine if the conversation is a chat by checking 'chats' 
+        // property of the agent participant
         if(!agentParticipant || !agentParticipant.chats) {
             view.showInfoModal('Sorry. This conversation is not a Webchat.');
             return null;
@@ -210,6 +208,7 @@ function sendLinkToChat(){
         // Get last id just in case there are multiple
         communicationId = chats[chats.length - 1].id;
 
+        // Send the chat message
         return conversationsApi.postConversationsChatCommunicationMessages(
             conversationId,
             communicationId,
@@ -225,7 +224,6 @@ function sendLinkToChat(){
         }
     })
     .catch(e => console.error(e));
-
 }   
 
 
@@ -250,14 +248,14 @@ client.loginImplicitGrant(
     
     // Get Details of current User
     return usersApi.getUsersMe();
-}).then(userMe => {
-    userId = userMe.id;
+}).then(data => {
+    userMe = data;
 
-    // Get current chat conversations
-    return processActiveChats(userMe.name);
-}).then(agentName => { 
-    // Create the channel for chat notifications
-    return setupChatChannel(agentName);
+    // Get current conversations
+    return processActiveConversations();
+}).then(() => { 
+    // Create the channel conversation notifications
+    return setupChannel();
 }).then(data => {
     console.log('Finished Setup');
     view.showAgentControls();

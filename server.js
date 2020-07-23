@@ -29,6 +29,7 @@ const conversationsApi = new platformClient.ConversationsApi();
 
 // DIctionary of sessions
 // Key: conversation ID. Value: Session ID
+// NOTE: Use an actual service to keep track of sessions.
 let sessions = {};
 
 function checkConversationActive(conversationId){
@@ -129,12 +130,11 @@ app.get('/room/customer/:conversation_id', async (req, res) => {
     }
 });
 
-// Error page. For Testing only
-if(config.testMode){
-    app.get('/error', (req, res) => {
-        res.render('error.ejs', {});
-    });
-}
+
+app.get('/error', (req, res) => {
+    res.render('error.ejs', {});
+});
+
 
 httpsServer.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
