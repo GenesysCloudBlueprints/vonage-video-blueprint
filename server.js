@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const https = require('https');
 const fs = require('fs');
 const OpenTok = require('opentok');
@@ -53,6 +54,10 @@ function createSession(){
         });
     });
 }
+
+// Parsers
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Initialize the express app
 app.use(express.static(__dirname + '/public')); //
@@ -130,10 +135,35 @@ app.get('/room/customer/:conversation_id', async (req, res) => {
     }
 });
 
-
 app.get('/error', (req, res) => {
     res.render('error.ejs', {});
 });
+
+app.post('/sendlinktosms', async (req, res) => {
+    let body = req.body;
+    if(!body.conversationId ||
+        !body.address ||
+        !body.message
+        ) res.status(400);
+
+    // Check if in a session
+    if(!sessions[body.conversationId]) res.status(404);
+
+    // Send agentless SMS
+    let smsBody = {
+        fromAddress: '+13175763352',
+        toAddress: body.address,
+        toAddressMessengerType: 'sms',
+        textBody: body.message
+    }
+
+    conversationsApi.postConversationsMessagesAgentless(smsBody)
+    .then((data) => {
+        console.log('SMS sent');
+        res.status(200).send({success: true});
+    })
+    .catch((err) => console.error(err));
+})
 
 
 httpsServer.listen(port, () => {

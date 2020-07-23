@@ -37,9 +37,22 @@ export default {
         $('#emailModal').modal('show');
     },
 
+    hideEmailModal(){
+        $('#emailModal').modal('hide');
+        document.getElementById('emailModal')
+            .querySelectorAll('input')[0].value = '';
+    },
+
     showSMSModal(){ 
         $('#smsModal').modal('show');
     },
+
+    hideSMSModal(){ 
+        $('#smsModal').modal('hide');
+        document.getElementById('smsModal')
+            .querySelectorAll('input')[0].value = '';
+    },
+
 
     /**
      * 
@@ -68,8 +81,9 @@ export default {
      * @param {String} tabName 
      * @param {String} agentName 
      * @param {Function} onClick 
+     * @param {Function} onStart when vonage is initiated 
      */
-    addRoom(conversationId, tabName, agentName, onClick){
+    addRoom(conversationId, tabName, agentName, onClick, onStart){
         let newTabId = conversationId + '-tab';
         let newRoomId = conversationId + '-room';
 
@@ -123,8 +137,13 @@ export default {
             iframe.style.display = 'block';
             iframe.src = `https://localhost/room/agent/${conversationId}?username=${agentName}`;
         });
+        btnStartRoom.addEventListener('click', onStart);
     },
 
+    /**
+     * Remove room tab and iframe
+     * @param {String} conversationId 
+     */
     removeRoom(conversationId){
         let tabId = conversationId + '-tab';
         let roomId = conversationId + '-room';

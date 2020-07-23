@@ -97,7 +97,7 @@ function getSessionId(conversationId){
 }
 
 /**
- * Get current active chat conversations
+ * Get current active conversations
  */
 function processActiveConversations(){
     return conversationsApi.getConversations()
@@ -122,10 +122,24 @@ function addConversationAsTab(conversation){
     let customer = conversation.participants.find(p => p.purpose == 'customer');
     let tabName = customer.name ? customer.name : 'Conversation';
 
-    view.addRoom(conversation.id, tabName, userMe.name, () => {
+    view.addRoom(conversation.id, tabName, userMe.name, 
         // When tab is clicked switch the active conversation to this one
-        currentConversation = conversation;
-    });
+        () => {
+            currentConversation = conversation;
+
+            // Check if vonage is activated to show/hide agent controls
+            if(conversation.vonageActive){
+                view.showAgentControls();
+            }else{
+                view.hideAgentControls();
+            }
+        }, 
+        // When start vonage button is clicked add a property to the conversation
+        () => {
+            conversation.vonageActive = true;
+            view.showAgentControls();
+        }
+    );
 }
 
 /**
@@ -148,6 +162,10 @@ function setupChannel(){
                     p => p.purpose == 'agent');
                 let customerParticipant = participants.find(
                     p => p.purpose == 'customer');
+
+                    
+                // Ignore if email
+                if(agentParticipant.emails) return;
 
                 // Value to determine if conversation is already taken into account before
                 let isExisting = activeConversations.map((conv) => conv.id)
@@ -179,6 +197,19 @@ function setupChannel(){
 }
 
 /**
+ * Generate the invitation message that's sent ot the customer
+ */
+function getInvitationMessage(){
+    const conversationId = currentConversation.id
+    const customerParticipant = currentConversation.participants.find(p => 
+        p.purpose == 'customer');
+    const customerName = customerParticipant.name || '<No Name>';
+    const message = `Please join my Vonage Video Room at: https://localhost/room/customer/${conversationId}?username=${encodeURIComponent(customerName)}`;
+    
+    return message;
+}
+
+/**
  * Send the link to the room in the chat if interaction is chat.
  */
 function sendLinkToChat(){
@@ -188,6 +219,7 @@ function sendLinkToChat(){
     view.showInfoModal('Sending Link...');
 
     // Check if the conversation is chat, if not show a message
+    // TODO: Use currentconersation
     return conversationsApi.getConversation(conversationId)
     .then((data) => {
         let customerParticipant = data.participants.find(p => 
@@ -226,6 +258,82 @@ function sendLinkToChat(){
     .catch(e => console.error(e));
 }   
 
+/**
+ * Send chat link to email
+ * @param {String} address email address
+ */
+function sendLinkToEmail(address){
+    view.hideEmailModal();
+    view.showInfoModal('Sending Link...');
+
+    const queueId = '4750048b-1994-41d4-8410-a5760c49a6cd';
+
+    const emailConvBody = {
+        queueId: '4750048b-1994-41d4-8410-a5760c49a6cd',
+        provider: 'PureCloud Email',
+        toAddress: address,
+        direction: 'OUTBOUND'
+    }
+
+    const emailBody = {
+        to: [
+           {
+              email: address
+           }
+        ],
+        subject: 'Vonage Room Invitation',
+        textBody: getInvitationMessage()
+    }
+
+    let conversationId = '';
+
+    return conversationsApi.postConversationsEmails(emailConvBody)
+    .then((data) => {
+        conversationId = data.id;
+
+        return conversationsApi
+                .postConversationsEmailMessages(conversationId, emailBody);
+    })
+    .then((data) => {
+
+        return conversationsApi.getConversation(conversationId);
+    })
+    .then((conversation) => {
+        let agent = conversation.participants.find(p => p.purpose == 'agent');
+
+        return conversationsApi
+                .patchConversationsEmailParticipant(conversationId, agent.id, {
+                    state: 'disconnected',
+                    wrapupSkipped: true
+                })
+    })
+    .then(() => {
+        view.showInfoModal('Link sent!');
+    })
+    .catch((e) => console.error(e));
+}
+
+/**
+ * Send link through server sms
+ * @param {String} address 
+ */
+function sendLinkToSMS(address){
+    view.hideSMSModal();
+    view.showInfoModal('Sending Link...');
+
+    return fetch('https://localhost/sendlinktosms', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            conversationId: currentConversation.id,
+            address: address,
+            message: getInvitationMessage()
+        })
+    })
+    .then(response => response.json())
+}
 
 /** --------------------------------------------------------------
  *                       EVENT HANDLERS
@@ -237,6 +345,21 @@ document.getElementById('btn-sms')
 document.getElementById('btn-chat')
     .addEventListener('click', () => sendLinkToChat());
 
+document.getElementById('btn-send-email')
+    .addEventListener('click', () => {
+        let email = document.getElementById('inputEmail').value;
+        sendLinkToEmail(email)
+        .then(() => view.showInfoModal('Successfully sent link!'));
+    })
+
+document.getElementById('btn-send-sms')
+    .addEventListener('click', () => {
+        let address = document.getElementById('inputSMS').value;
+        sendLinkToSMS(address)
+        .then((data) => {
+            if(data.success) view.showInfoModal('Successfully sent link!');
+        });
+    })
 /** --------------------------------------------------------------
  *                       INITIAL SETUP
  * -------------------------------------------------------------- */
@@ -258,7 +381,6 @@ client.loginImplicitGrant(
     return setupChannel();
 }).then(data => {
     console.log('Finished Setup');
-    view.showAgentControls();
 
 // Error Handling
 }).catch(e => console.log(e));
