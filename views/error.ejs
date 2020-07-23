@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invaid Room</title>
+  <%- include('common/styles'); -%>
+</head>
+
+<body>
+  <div class="container">
+    <h5 class="error-message" id="message"></h5>
+  </div>  
+
+  <script type="text/javascript">
+    const urlParams = new URLSearchParams(window.location.search);
+    const message = urlParams.get('message');
+    const defaultMessage = 'Sorry. This is an invalid room.';
+
+    document.getElementById('message')
+      .textContent = message? message: defaultMessage;
+  </script>
+</body>
+</html>

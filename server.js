@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const https = require('https');
 const fs = require('fs');
 const OpenTok = require('opentok');
@@ -29,6 +30,7 @@ const conversationsApi = new platformClient.ConversationsApi();
 
 // DIctionary of sessions
 // Key: conversation ID. Value: Session ID
+// NOTE: Use an actual service to keep track of sessions.
 let sessions = {};
 
 function checkConversationActive(conversationId){
@@ -53,6 +55,10 @@ function createSession(){
     });
 }
 
+// Parsers
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 // Initialize the express app
 app.use(express.static(__dirname + '/public')); //
 
@@ -73,7 +79,7 @@ app.get('/room/agent/:conversation_id', async (req, res) => {
 
     if(!conversationActive && !config.testMode){
         // If conversation has ended or invalid, show the error page
-        res.render('invalid-room.ejs', {});
+        res.render('error.ejs', {});
     }else{
         // Create room if none created for conversation yet.
         if(!sessions[conversation_id]){
@@ -106,7 +112,7 @@ app.get('/room/customer/:conversation_id', async (req, res) => {
 
     if(!conversationActive && !config.testMode){
         // If conversation has ended or invalid, show the error page
-        res.render('invalid-room.ejs', {});
+        res.render('error.ejs', {});
     }else{
         // Create room if none created for conversation yet.
         if(!sessions[conversation_id]){
@@ -128,6 +134,37 @@ app.get('/room/customer/:conversation_id', async (req, res) => {
         });
     }
 });
+
+app.get('/error', (req, res) => {
+    res.render('error.ejs', {});
+});
+
+app.post('/sendlinktosms', async (req, res) => {
+    let body = req.body;
+    if(!body.conversationId ||
+        !body.address ||
+        !body.message
+        ) res.status(400);
+
+    // Check if in a session
+    if(!sessions[body.conversationId]) res.status(404);
+
+    // Send agentless SMS
+    let smsBody = {
+        fromAddress: '+13175763352',
+        toAddress: body.address,
+        toAddressMessengerType: 'sms',
+        textBody: body.message
+    }
+
+    conversationsApi.postConversationsMessagesAgentless(smsBody)
+    .then((data) => {
+        console.log('SMS sent');
+        res.status(200).send({success: true});
+    })
+    .catch((err) => console.error(err));
+})
+
 
 httpsServer.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
