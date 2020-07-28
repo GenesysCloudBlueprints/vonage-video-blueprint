@@ -87,7 +87,13 @@
 
   <!-- Footer Contorls -->
   <div id="agent-controls">
-    <div class="container">
+    <div class="container">      
+      <span>Share Screen: </span>
+      <label class="switch">
+        <input type="checkbox" id="share-screen-switch">
+        <span class="slider round"></span>
+      </label>
+      <span>   |   </span>
       <span>Send Room Link: </span>
       <button id="btn-email" type="button" class="btn btn-light">Email</button>
       <button id="btn-sms" type="button" class="btn btn-light">SMS</button>
@@ -107,7 +113,7 @@
   <template id="room-template">
     <div class="tab-pane fade">
       <div class="container text-center">
-        <button type="button" class="btn btn-dark btn-start-room">Start a Vonage Room</button>
+        <button type="button" class="btn-start-room">Start a Vonage Room</button>
       </div>
       <iframe class="room-iframe"></iframe>
     </div>

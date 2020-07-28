@@ -191,6 +191,9 @@ function setupChannel(){
                         patchConversation(conversationId, customerParticipant.id, sessionId)
                         .catch(e => console.error(e));
                     }
+
+                    view.showErrorIframe('No Active Interaction');
+                    view.hideAgentControls();
                 }
             });
     });

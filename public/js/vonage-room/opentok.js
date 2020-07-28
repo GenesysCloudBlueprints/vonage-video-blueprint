@@ -12,24 +12,26 @@ let session = OT.initSession(apiKey, sessionId);
 let publisher = OT.initPublisher(elPublisherId,
 {
     name: userName,
-    style: { nameDisplayMode: 'on' },
-    height: 300,
-    width: 300,
+    height: '100%',
+    width: '100%',
+    showControls: true
 });
 let screenSharePublisher = null;
 
 // Initial setup for the page
 function setup(){  
     document.getElementById(elShareScreenContainerId).style.display = null;
-    
-    // Event Listeners
-    document.getElementById('btnShareScreenStart')
-            .addEventListener('click', () => {
-        startShareScreen();
-    });
-    document.getElementById('btnShareScreenStop')
-            .addEventListener('click', () => {
-        stopShareScreen();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkbox = window.parent.document.querySelector('input[type="checkbox"]');
+
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                startShareScreen();
+            } else {
+                stopShareScreen();
+            }
+        });
     });
 }
 
@@ -44,8 +46,15 @@ function startShareScreen(){
             // Screen sharing is available. Publish the screen.
             //document.getElementById('share-screen-container')
 
+            var publishOptions = {};
+            // publishOptions.maxResolution = { width: 1920, height: 1080 };
+            publishOptions.videoSource = 'screen';
+            publishOptions.fitMode = 'cover';
+            publishOptions.width = '100%';
+            publishOptions.height = '100%';
+
             screenSharePublisher = OT.initPublisher(elShareScreenContainerId,
-                {videoSource: 'screen'},
+                publishOptions,
                 function(error) {
                     if (error) {
                         console.error(error)
@@ -62,6 +71,7 @@ function startShareScreen(){
 
 function stopShareScreen(){
     document.getElementById(elShareScreenContainerId).style.display = 'none';
+
     if(screenSharePublisher) screenSharePublisher.publishVideo(false);
 }
 
@@ -77,7 +87,10 @@ session.on({
     // This function runs when another client publishes a stream (eg. session.publish())
     streamCreated: function (event) {
         let subOptions = {
-            appendMode: 'append'
+            appendMode: 'append',
+            showControls: true,
+            width: '100%',
+            height: '100%'
         };
     
         let parentElementId = event.stream.videoType === 'screen' ?
@@ -86,6 +99,9 @@ session.on({
         subscriber = session.subscribe(event.stream, parentElementId, subOptions);
 
         session.subscribe(event.stream, elSubscribersId, { insertMode: 'append' });
+
+        // Hide publisher div when susbcriber joins
+        document.getElementById(elPublisherId).style.display = 'none';
     }
 });
 

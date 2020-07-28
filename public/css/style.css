@@ -3,6 +3,26 @@
     height: 500px;
 }
 
+/* #subscribers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+#publisher {
+    position: absolute;
+    width: 360px;
+    height: 240px;
+    bottom: 10px;
+    left: 10px;
+    z-index: 100;
+    border: 3px solid white;
+    border-radius: 3px;
+} */
+
 .jumbotron {
     padding: 7px !important;
     background-color: #FF4F1F !important;
@@ -20,19 +40,65 @@ h1 {
     margin-left: 60px;
 }
 
-#publisher, #subscribers {
+#publisher, #subscribers, #share-screen-container, #sub-share-screen {
     margin: 20px;
 }
 
-#interaction-details {
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
+@media only screen and (min-width: 600px) {
+    #subscribers {
+        width: auto;
+        height: auto;
+        min-height: 350px;
+    }
+
+    #publisher {
+        width: auto;
+        height: auto;
+        min-height: 350px;
+    }
+
+    #share-screen-container {
+        width: auto;
+        height: auto;
+        min-height: 350px;
+    }
+
+    #sub-share-screen {
+        width: auto;
+        height: auto;
+        min-height: 350px;
+    }
 }
 
-#btnShareScreenStart, #btnShareScreenStop, #btnSendURL {
+@media only screen and (min-width: 1000px) {
+    #subscribers {
+        width: auto;
+        height: auto;
+        min-height: 650px;
+    }
+
+    #publisher {
+        width: auto;
+        height: auto;
+        min-height: 650px;
+    }
+
+    #share-screen-container {
+        width: auto;
+        height: auto;
+        min-height: 650px;
+    }
+
+    #sub-share-screen {
+        width: auto;
+        height: auto;
+        min-height: 650px;
+    }
+}
+
+#btnShareScreenStart, #btnShareScreenStop, #btnSendURL, 
+#btn-email, #btn-sms, #btn-chat, 
+.btn-start-room {
     background-color:white; 
     border-color:#FF4F1F; 
     border-radius:25px; 
@@ -41,7 +107,9 @@ h1 {
     border: 2px solid #FF4F1F;
 }
 
-#btnShareScreenStart:hover, #btnShareScreenStop:hover, #btnSendURL:hover {
+#btnShareScreenStart:hover, #btnShareScreenStop:hover, #btnSendURL:hover, 
+#btn-email:hover, #btn-sms:hover, #btn-chat:hover, 
+.btn-start-room:hover {
     background-color:#FF4F1F; 
     border-color:#FF4F1F; 
     border-radius:25px; 
@@ -49,21 +117,47 @@ h1 {
     border-width: 2px;
 }
 
-#btnShareScreenStart:focus, #btnShareScreenStop:focus, #btnSendURL:focus {
+#btnShareScreenStart:focus, #btnShareScreenStop:focus, #btnSendURL:focus, 
+#btn-email:focus, #btn-sms:focus, #btn-chat:focus, 
+.btn-start-room:focus {
     box-shadow: 0 0 0 0 !important;
     border-color: #FF4F1F !important;
     outline: none !important;
 } 
 
 #agent-controls {
-    display: none; 
-    background: #333;
+    display: none;
+    background: #5D3E5D;
     color: #fff;
     position: fixed;
     bottom: 0;
     width: 100%;
     padding: 10px 0px;
-    font-size: 1.2em;
+    font-size: 1em;
+}
+
+@media (min-width: 576px) {
+    #agent-controls .container{
+        max-width: 580px;
+    }
+}
+
+#btn-email, #btn-sms, #btn-chat {
+    width: 80px;
+}
+
+@media only screen and (min-width: 1000px) {
+    #subscribers {
+        width: auto;
+        height: auto;
+        min-height: 650px;
+    }
+
+    #publisher {
+        width: auto;
+        height: auto;
+        min-height: 350px;
+    }
 }
 
 #infoModalText {
@@ -74,8 +168,21 @@ h1 {
     display: none;
 }
 
+.nav-tabs {
+    border-bottom: 1px solid #FF4F1F !important;
+}
+
 .nav-item {
     cursor: pointer;
+}
+
+.nav-link.active {
+    color: #FF4F1F;
+    border-color: #FF4F1F #FF4F1F #fff !important;
+}
+
+.nav-link:hover {
+    border-color: #FF4F1F #FF4F1F #fff !important;
 }
 
 .btn-start-room {
@@ -94,3 +201,63 @@ h1 {
 .error-message {
     margin-top: 30px;
 }
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 28px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #FF4F1F;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #FF4F1F;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
