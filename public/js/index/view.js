@@ -76,7 +76,7 @@ export default {
     },
 
     uncheckScreenShare(){
-        document.getElementById('share-screen-switch').attributes('checked', false);
+        document.getElementById('share-screen-switch').checked = false;
     },
 
     showPublisher(){
