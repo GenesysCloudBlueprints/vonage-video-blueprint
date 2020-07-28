@@ -1,6 +1,8 @@
 /* global OT, apiKey, sessionId, token */
 // TODO: Move some stuff to view
 
+import view from '../index/view.js';
+
 const elPublisherId = 'publisher';
 const elSubscribersId = 'subscribers';
 const elShareScreenContainerId = 'share-screen-container';
@@ -17,10 +19,12 @@ let publisher = OT.initPublisher(elPublisherId,
     showControls: true
 });
 let screenSharePublisher = null;
+let subscriber = null;
 
 // Initial setup for the page
-function setup(){  
-    document.getElementById(elShareScreenContainerId).style.display = null;
+function setup(){
+    view.hideShareScreen();
+    view.hideSubShareScreen();
 
     document.addEventListener('DOMContentLoaded', function () {
         var checkbox = window.parent.document.querySelector('input[type="checkbox"]');
@@ -36,7 +40,8 @@ function setup(){
 }
 
 function startShareScreen(){
-    document.getElementById(elShareScreenContainerId).style.display = null;
+    view.hideShareScreen();
+
     OT.checkScreenSharingCapability(function(response) {
         if(!response.supported || response.extensionRegistered === false) {
             // This browser does not support screen sharing.
@@ -44,10 +49,9 @@ function startShareScreen(){
             // Prompt to install the extension.
         } else {
             // Screen sharing is available. Publish the screen.
-            //document.getElementById('share-screen-container')
+            view.showShareScreen();
 
             var publishOptions = {};
-            // publishOptions.maxResolution = { width: 1920, height: 1080 };
             publishOptions.videoSource = 'screen';
             publishOptions.fitMode = 'cover';
             publishOptions.width = '100%';
@@ -70,7 +74,7 @@ function startShareScreen(){
 }
 
 function stopShareScreen(){
-    document.getElementById(elShareScreenContainerId).style.display = 'none';
+    view.hideShareScreen();
 
     if(screenSharePublisher) screenSharePublisher.publishVideo(false);
 }
@@ -100,8 +104,32 @@ session.on({
 
         session.subscribe(event.stream, elSubscribersId, { insertMode: 'append' });
 
-        // Hide publisher div when susbcriber joins
-        document.getElementById(elPublisherId).style.display = 'none';
+        if(parentElementId == 'subscribers') {
+            // Hide publisher div when susbcriber joins
+            view.hidePublisher();
+        } else if (parentElementId == 'sub-share-screen') {
+            // Hide share-screen-container div when subscriber shares screen
+            view.showSubShareScreen();
+        }
+    },
+
+    streamDestroyed: function (event) {
+        view.hideSubShareScreen();
+
+        if(event.stream.videoType == 'screen'){
+            event.preventDefault();
+        } else if(event.stream.videoType == 'camera'){
+            window.close();
+        }
+    }
+});
+
+publisher.on({
+    streamDestroyed: function (event) {
+        if(event.stream.videoType == 'screen'){
+            event.preventDefault();
+            view.hideShareScreen();
+        } 
     }
 });
 
