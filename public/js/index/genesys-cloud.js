@@ -194,6 +194,7 @@ function setupChannel(){
 
                     view.showErrorIframe('No Active Interaction');
                     view.hideAgentControls();
+                    view.uncheckScreenShare();
                 }
             });
     });

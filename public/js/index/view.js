@@ -82,6 +82,9 @@ export default {
 
     hideAgentControls(){
         document.getElementById('agent-controls').style.display = 'none';
+    },
+
+    uncheckScreenShare(){
         document.getElementById('share-screen-switch').attributes('checked', false);
     },
 
