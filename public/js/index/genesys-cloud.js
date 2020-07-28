@@ -339,13 +339,38 @@ function sendLinkToSMS(address){
     .then(response => response.json())
 }
 
+/**
+ * If the current conversation is call get the ANI
+ * if not return null 
+ */
+function getCurrentCustomerANI(){
+    let customer = currentConversation.participants
+        .find(p => p.purpose == 'customer');
+    // Remove 'tel:' prefix
+    return customer && customer.ani ? customer.ani.substr(4) : null;
+}
+
+/**
+ * If the current conversation is chat return the email attribute
+ * If not return not
+ */
+function getCurrentCustomerEmail(){
+    let customer = currentConversation.participants
+        .find(p => p.purpose == 'customer');
+    return customer.attributes['context.email'];
+}
+
 /** --------------------------------------------------------------
  *                       EVENT HANDLERS
  * -------------------------------------------------------------- */
 document.getElementById('btn-email')
-    .addEventListener('click', () => view.showEmailModal());
+    .addEventListener('click', () => 
+        view.showEmailModal(getCurrentCustomerEmail())
+    );
 document.getElementById('btn-sms')
-    .addEventListener('click', () => view.showSMSModal());
+    .addEventListener('click', () => 
+        view.showSMSModal(getCurrentCustomerANI())
+    );
 document.getElementById('btn-chat')
     .addEventListener('click', () => sendLinkToChat());
 

@@ -33,7 +33,12 @@ export default {
         iframe.style.display = 'none';
     },
 
-    showEmailModal(){
+    showEmailModal(email){
+        console.log(email);
+        if(email){
+            document.getElementById('emailModal')
+                .querySelectorAll('input')[0].value = email;
+        }
         $('#emailModal').modal('show');
     },
 
@@ -43,7 +48,11 @@ export default {
             .querySelectorAll('input')[0].value = '';
     },
 
-    showSMSModal(){ 
+    showSMSModal(ani){ 
+        if(ani){
+            document.getElementById('smsModal')
+                .querySelectorAll('input')[0].value = ani;
+        }
         $('#smsModal').modal('show');
     },
 
