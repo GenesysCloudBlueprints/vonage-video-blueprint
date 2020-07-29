@@ -12,12 +12,13 @@ let session = OT.initSession(apiKey, sessionId);
 
 // Initialize the camera publisher
 let publisher = OT.initPublisher(elPublisherId,
-{
-    name: userName,
-    height: '100%',
-    width: '100%',
-    showControls: true
-});
+    {
+        name: userName,
+        height: '100%',
+        width: '100%',
+        showControls: true
+    });
+
 let screenSharePublisher = null;
 let subscriber = null;
 
@@ -69,6 +70,20 @@ function startShareScreen(){
                     }
                 }
             );
+
+            screenSharePublisher.on({
+                streamDestroyed: function (event) {
+                    if (event.reason === 'mediaStopped') {
+                        event.preventDefault();
+                        view.hideShareScreen();
+                    }
+                },
+            
+                mediaStopped: function (event) {
+                    event.preventDefault();
+                    view.hideShareScreen();
+                }
+            });
         }
     });
 }
@@ -76,7 +91,7 @@ function startShareScreen(){
 function stopShareScreen(){
     view.hideShareScreen();
 
-    if(screenSharePublisher) screenSharePublisher.publishVideo(false);
+    session.unpublish(screenSharePublisher);
 }
 
 // Attach event handlers
@@ -114,22 +129,12 @@ session.on({
     },
 
     streamDestroyed: function (event) {
-        view.hideSubShareScreen();
-
-        if(event.stream.videoType == 'screen'){
+        if(event.reason == 'clientDisconnected' && event.stream.videoType == 'screen'){
+            view.hideSubShareScreen();
             event.preventDefault();
-        } else if(event.stream.videoType == 'camera'){
+        } else if (event.reason == 'clientDisconnected' && event.stream.videoType == 'camera'){
             window.close();
         }
-    }
-});
-
-publisher.on({
-    streamDestroyed: function (event) {
-        if(event.stream.videoType == 'screen'){
-            event.preventDefault();
-            view.hideShareScreen();
-        } 
     }
 });
 
