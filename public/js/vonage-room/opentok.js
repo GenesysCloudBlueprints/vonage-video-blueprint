@@ -1,7 +1,6 @@
 /* global OT, apiKey, sessionId, token */
-// TODO: Move some stuff to view
 
-import view from '../index/view.js';
+import view from './view.js';
 
 const elPublisherId = 'publisher';
 const elSubscribersId = 'subscribers';
@@ -121,7 +120,7 @@ session.on({
 
         if(parentElementId == 'subscribers') {
             // Hide publisher div when susbcriber joins
-            view.hidePublisher();
+            // view.hidePublisher();
         } else if (parentElementId == 'sub-share-screen') {
             // Hide share-screen-container div when subscriber shares screen
             view.showSubShareScreen();

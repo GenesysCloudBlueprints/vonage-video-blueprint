@@ -88,30 +88,6 @@ export default {
         document.getElementById('share-screen-switch').checked = false;
     },
 
-    showPublisher(){
-        document.getElementById('publisher').style.display = 'block';
-    },
-
-    hidePublisher(){
-        document.getElementById('publisher').style.display = 'none';
-    },
-
-    showShareScreen(){
-        document.getElementById('share-screen-container').style.display = 'block';
-    },
-
-    hideShareScreen(){
-        document.getElementById('share-screen-container').style.display = 'none';
-    },
-
-    showSubShareScreen(){
-        document.getElementById('sub-share-screen').style.display = 'block';
-    },
-
-    hideSubShareScreen(){
-        document.getElementById('sub-share-screen').style.display = 'none';
-    },
-
     /**
      * Add a room to the navbar
      * @param {String} conversationId 
