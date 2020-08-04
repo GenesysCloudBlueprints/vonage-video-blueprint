@@ -73,7 +73,7 @@ function startShareScreen(){
 
             screenSharePublisher.on({
                 streamDestroyed: function (event) {
-                    if (event.reason === 'mediaStopped') {
+                    if (event.reason === 'mediaStopped' || event.reason === 'unpublished') {
                         event.preventDefault();
                         view.hideShareScreen();
                     }
@@ -129,7 +129,7 @@ session.on({
     },
 
     streamDestroyed: function (event) {
-        if(event.reason == 'clientDisconnected' && event.stream.videoType == 'screen'){
+        if(event.reason == 'clientDisconnected' && event.stream.videoType == 'screen'){            
             view.hideSubShareScreen();
             event.preventDefault();
         } else if (event.reason == 'clientDisconnected' && event.stream.videoType == 'camera'){

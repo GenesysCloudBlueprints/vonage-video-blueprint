@@ -146,20 +146,6 @@ h1 {
     width: 80px;
 }
 
-@media only screen and (min-width: 1000px) {
-    #subscribers {
-        width: auto;
-        height: auto;
-        min-height: 650px;
-    }
-
-    #publisher {
-        width: auto;
-        height: auto;
-        min-height: 350px;
-    }
-}
-
 #infoModalText {
     margin-top: 18px;
 }
