@@ -1,17 +1,38 @@
 export default {
     showShareScreen(){
         document.getElementById('share-screen-container').style.display = 'block';
+        document.querySelectorAll('.stream-container').forEach(n => {
+            n.classList.add('smaller-stream');
+        });
     },
 
     hideShareScreen(){
         document.getElementById('share-screen-container').style.display = 'none';
+        document.querySelectorAll('.stream-container').forEach(n => {
+            n.classList.remove('smaller-stream');
+        });
     },
 
-    showSubShareScreen(){
-        document.getElementById('sub-share-screen').style.display = 'block';
+    addPubShareScreen(){
+        if(!document.getElementById('pub-share-screen')){
+            let container = document.getElementById('share-screen-container');
+            let newShareScreen = document.createElement('div');
+            newShareScreen.id = 'pub-share-screen';
+            container.appendChild(newShareScreen);
+        }
     },
 
-    hideSubShareScreen(){
-        document.getElementById('sub-share-screen').style.display = 'none';
+    addSubShareScreen(){
+        if(!document.getElementById('sub-share-screen')){
+            let container = document.getElementById('share-screen-container');
+            let newShareScreen = document.createElement('div');
+            newShareScreen.id = 'sub-share-screen';
+            container.appendChild(newShareScreen);
+        }
+    },
+
+    isAnyoneSharing(){
+        let container = document.getElementById('share-screen-container');
+        return container && container.childElementCount > 0;
     }
 }

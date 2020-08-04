@@ -26,12 +26,27 @@
         <span class="slider round"></span>
       </label>
     </div>
-    <div id="publisher"></div>
-    <div id="subscribers"></div>
-    <div id="share-screen-container"></div>
-    <div id="sub-share-screen"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md mx-auto">
+          <div class="text-center">Agent</div>
+          <div class="stream-container mx-auto">
+            <div id="subscribers"></div>
+          </div>
+        </div>
+        <div class="col-md mx-auto">
+          <div class="text-center">Customer</div>
+          <div class="stream-container mx-auto">
+            <div id="publisher"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row" id="share-screen-container">
+        <!-- <div id="pub-share-screen"></div> -->
+        <!-- <div id="sub-share-screen"></div> -->
+      </div>
+    </div>
   </div>
-
   <script type="module"  src="/js/vonage-room/opentok.js"></script>
 </body>
 </html>

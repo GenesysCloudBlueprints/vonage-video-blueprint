@@ -1,28 +1,3 @@
-#publisher {
-    width: 500px;
-    height: 500px;
-}
-
-/* #subscribers {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
-}
-
-#publisher {
-    position: absolute;
-    width: 360px;
-    height: 240px;
-    bottom: 10px;
-    left: 10px;
-    z-index: 100;
-    border: 3px solid white;
-    border-radius: 3px;
-} */
-
 .jumbotron {
     padding: 7px !important;
     background-color: #FF4F1F !important;
@@ -40,61 +15,49 @@ h1 {
     margin-left: 60px;
 }
 
-#publisher, #subscribers, #share-screen-container, #sub-share-screen {
+#share-screen-container {
+    height: 640px;
+}
+
+#sub-share-screen, #pub-share-screen {
+    margin-bottom: 20px;
+}
+
+.smaller-stream {
+    height: 160px!important;
+    width: 180px!important;
+}
+
+.stream-container {
+    margin: 10px;
+    height: 480px;
+    transition-duration: 0.5s;
+    transition-timing-function: ease;
+}
+
+@media only screen and (min-width: 767px) {
+    .stream-container {
+        height: 250px;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    .stream-container {
+        height: 350px;
+    }
+}
+
+@media only screen and (min-width: 1216px) {
+    .stream-container {
+        height: 480px;
+    }
+}
+
+
+/* #publisher, #subscribers, #share-screen-container, #sub-share-screen {
     margin: 20px;
-}
-
-@media only screen and (min-width: 600px) {
-    #subscribers {
-        width: auto;
-        height: auto;
-        min-height: 350px;
-    }
-
-    #publisher {
-        width: auto;
-        height: auto;
-        min-height: 350px;
-    }
-
-    #share-screen-container {
-        width: auto;
-        height: auto;
-        min-height: 350px;
-    }
-
-    #sub-share-screen {
-        width: auto;
-        height: auto;
-        min-height: 350px;
-    }
-}
-
-@media only screen and (min-width: 1000px) {
-    #subscribers {
-        width: auto;
-        height: auto;
-        min-height: 650px;
-    }
-
-    #publisher {
-        width: auto;
-        height: auto;
-        min-height: 650px;
-    }
-
-    #share-screen-container {
-        width: auto;
-        height: auto;
-        min-height: 650px;
-    }
-
-    #sub-share-screen {
-        width: auto;
-        height: auto;
-        min-height: 650px;
-    }
-}
+    min-height: 400px;
+} */
 
 #btnShareScreenStart, #btnShareScreenStop, #btnSendURL, 
 #btn-email, #btn-sms, #btn-chat, 
@@ -144,20 +107,6 @@ h1 {
 
 #btn-email, #btn-sms, #btn-chat {
     width: 80px;
-}
-
-@media only screen and (min-width: 1000px) {
-    #subscribers {
-        width: auto;
-        height: auto;
-        min-height: 650px;
-    }
-
-    #publisher {
-        width: auto;
-        height: auto;
-        min-height: 350px;
-    }
 }
 
 #infoModalText {

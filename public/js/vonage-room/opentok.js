@@ -4,7 +4,8 @@ import view from './view.js';
 
 const elPublisherId = 'publisher';
 const elSubscribersId = 'subscribers';
-const elShareScreenContainerId = 'share-screen-container';
+const elPubShareScreenId = 'pub-share-screen';
+const elSubShareScreenId = 'sub-share-screen';
 
 // Initialize an OpenTok Session object
 let session = OT.initSession(apiKey, sessionId);
@@ -15,16 +16,21 @@ let publisher = OT.initPublisher(elPublisherId,
         name: userName,
         height: '100%',
         width: '100%',
-        showControls: true
+        showControls: true,
+        style: {
+            nameDisplayMode: 'on'
+        }
     });
 
-let screenSharePublisher = null;
+// For this demo we're just assuming one customer
 let subscriber = null;
+let screenSharePublisher = null;
+let screenShareSubscriber = null;
+
 
 // Initial setup for the page
 function setup(){
     view.hideShareScreen();
-    view.hideSubShareScreen();
 
     document.addEventListener('DOMContentLoaded', function () {
         var checkbox = window.parent.document.querySelector('input[type="checkbox"]');
@@ -40,8 +46,6 @@ function setup(){
 }
 
 function startShareScreen(){
-    view.hideShareScreen();
-
     OT.checkScreenSharingCapability(function(response) {
         if(!response.supported || response.extensionRegistered === false) {
             // This browser does not support screen sharing.
@@ -49,48 +53,50 @@ function startShareScreen(){
             // Prompt to install the extension.
         } else {
             // Screen sharing is available. Publish the screen.
+            view.addPubShareScreen();
             view.showShareScreen();
 
-            var publishOptions = {};
-            publishOptions.videoSource = 'screen';
-            publishOptions.fitMode = 'cover';
-            publishOptions.width = '100%';
-            publishOptions.height = '100%';
+            var publishOptions = {
+                name: userName + '\'s screen',
+                videoSource: 'screen',
+                width: '100%',
+                height: '100%',
+                appendMode: 'append',
+                style: {
+                    nameDisplayMode: 'on'
+                }
+            };
 
-            screenSharePublisher = OT.initPublisher(elShareScreenContainerId,
+            screenSharePublisher = OT.initPublisher(elPubShareScreenId,
                 publishOptions,
                 function(error) {
                     if (error) {
-                        console.error(error)
+                        console.error(error);
+                        onShareScreenStop();
                     } else {
-                    session.publish(screenSharePublisher, function(error) {
-                        if (error) console.error(error)
-                    });
+                        session.publish(screenSharePublisher, 
+                            function(error) {
+                                if (error) console.error(error);
+                            }
+                        );
                     }
                 }
             );
 
-            screenSharePublisher.on({
-                streamDestroyed: function (event) {
-                    if (event.reason === 'mediaStopped') {
-                        event.preventDefault();
-                        view.hideShareScreen();
-                    }
-                },
-            
-                mediaStopped: function (event) {
-                    event.preventDefault();
-                    view.hideShareScreen();
-                }
-            });
+            screenSharePublisher.on('streamDestroyed', onShareScreenStop);
         }
     });
 }
 
 function stopShareScreen(){
-    view.hideShareScreen();
+    screenSharePublisher.destroy();
+}
 
-    session.unpublish(screenSharePublisher);
+/**
+ * If subscriber or publisher stops a screen share
+ */
+function onShareScreenStop(event){
+    if(!view.isAnyoneSharing()) view.hideShareScreen();
 }
 
 // Attach event handlers
@@ -108,30 +114,30 @@ session.on({
             appendMode: 'append',
             showControls: true,
             width: '100%',
-            height: '100%'
+            height: '100%',
+            style: {
+                nameDisplayMode: 'on'
+            }
         };
     
-        let parentElementId = event.stream.videoType === 'screen' ?
-            'sub-share-screen' :
-            'subscribers';
-        subscriber = session.subscribe(event.stream, parentElementId, subOptions);
-
-        session.subscribe(event.stream, elSubscribersId, { insertMode: 'append' });
-
-        if(parentElementId == 'subscribers') {
-            // Hide publisher div when susbcriber joins
-            // view.hidePublisher();
-        } else if (parentElementId == 'sub-share-screen') {
-            // Hide share-screen-container div when subscriber shares screen
-            view.showSubShareScreen();
+        // Set subscriber objects to global reference
+        if( event.stream.videoType === 'screen'){
+            // Screen share
+            view.addSubShareScreen();
+            screenShareSubscriber = session.subscribe(
+                event.stream, elSubShareScreenId, subOptions);
+            screenShareSubscriber.on('destroyed', onShareScreenStop);
+            view.showShareScreen();
+        } else {
+            // Subscriber main/camera
+            subscriber = session.subscribe(
+                event.stream, elSubscribersId, subOptions);
         }
     },
 
     streamDestroyed: function (event) {
-        if(event.reason == 'clientDisconnected' && event.stream.videoType == 'screen'){
-            view.hideSubShareScreen();
-            event.preventDefault();
-        } else if (event.reason == 'clientDisconnected' && event.stream.videoType == 'camera'){
+        if (event.reason == 'clientDisconnected' && 
+                event.stream.videoType == 'camera'){
             window.close();
         }
     }
