@@ -96,7 +96,9 @@ function stopShareScreen(){
  * If subscriber or publisher stops a screen share
  */
 function onShareScreenStop(event){
-    if(!view.isAnyoneSharing()) view.hideShareScreen();
+    setTimeout(() => {
+        if(!view.isAnyoneSharing()) view.hideShareScreen();
+    }, 100);
 }
 
 // Attach event handlers
