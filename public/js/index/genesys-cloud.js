@@ -4,6 +4,10 @@ import view from './view.js';
 // Obtain a reference to the platformClient object
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
+client.setPersistSettings(true, 'VonageIntegration');
+
+// Client App instance
+let vonageClientApp = null;
 
 // API instances
 const usersApi = new platformClient.UsersApi();
@@ -250,6 +254,60 @@ function getCurrentCustomerEmail(){
     return customer.attributes['context.email'];
 }
 
+/**
+ * Client App SDK initialization
+ */
+function initializeClientApp(){
+    let ClientApp = window.purecloud.apps.ClientApp;
+    const env = localStorage.getItem('clientAppEnvironment');
+    if(env){
+        vonageClientApp = new ClientApp({
+            pcEnvironment: env
+        });
+    } else {
+        vonageClientApp = new ClientApp({
+            pcEnvironmentQueryParam: 'environment'
+        });
+        localStorage.setItem('clientAppEnvironment', 
+                                vonageClientApp._pcEnv.pcEnvTld);
+    }
+}
+
+/**
+ * OAuth flow
+ */
+function initializeApp(){
+    client.loginImplicitGrant(
+        '5f3e661d-61be-4a13-b536-3f54f24e26c9',
+        redirectUri, // From the global variable set by template in index.ejs
+        { state: currentConversationId })
+    .then(data => {
+        console.log(data);
+        // Assigne conversation id
+        currentConversationId = data.state;
+        
+        // Get Details of current User
+        return usersApi.getUsersMe();
+    }).then(data => {
+        userMe = data;
+    
+        // Get current conversation
+        return conversationsApi.getConversation(currentConversationId);
+    }).then((conv) => { 
+        currentConversation = conv;
+    
+        // Create the channel conversation notifications
+        return setupChannel();
+    }).then(data => {
+        view.showVonageSession(currentConversationId, userMe.name);
+    
+        console.log('Finished Setup');
+        vonageClientApp.lifecycle.bootstrapped();
+    // Error Handling
+    }).catch(e => console.log(e));
+}
+
+
 /** --------------------------------------------------------------
  *                       EVENT HANDLERS
  * -------------------------------------------------------------- */
@@ -284,32 +342,7 @@ document.getElementById('btn-send-sms')
  * -------------------------------------------------------------- */
 const urlParams = new URLSearchParams(window.location.search);
 currentConversationId = urlParams.get('conversationid');
+console.log(currentConversationId);
 
-client.loginImplicitGrant(
-    '5f3e661d-61be-4a13-b536-3f54f24e26c9',
-    'https://localhost/',
-    { state: currentConversationId })
-.then(data => {
-    console.log(data);
-    // Assigne conversation id
-    currentConversationId = data.state;
-    
-    // Get Details of current User
-    return usersApi.getUsersMe();
-}).then(data => {
-    userMe = data;
-
-    // Get current conversation
-    return conversationsApi.getConversation(currentConversationId);
-}).then((conv) => { 
-    currentConversation = conv;
-
-    // Create the channel conversation notifications
-    return setupChannel();
-}).then(data => {
-    view.showVonageSession(currentConversationId, userMe.name);
-
-    console.log('Finished Setup');
-
-// Error Handling
-}).catch(e => console.log(e));
+initializeClientApp();
+initializeApp();

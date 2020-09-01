@@ -7,7 +7,11 @@
   <%- include('common/styles'); -%>
   
   <script src="https://sdk-cdn.mypurecloud.com/javascript/89.0.0/purecloud-platform-client-v2.min.js"></script>
+  <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.4.0/purecloud-client-app-sdk.js"></script>
   <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+  <script type="text/javascript">
+    var redirectUri = '<%= redirectUri %>';
+  </script>
   <script type="module"  src="/js/index/genesys-cloud.js"></script>
 </head>
 <body>
