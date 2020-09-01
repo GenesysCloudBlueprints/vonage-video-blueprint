@@ -66,7 +66,9 @@ app.use(express.static(__dirname + '/public')); //
 app.set('view engine', 'ejs');
 
 app.get('/', async (req, res) => {
-    res.render('index.ejs');
+    res.render('index.ejs', {
+        redirectUri: 'https://localhost/'
+    });
 });
 
 // Create a session if not yet created

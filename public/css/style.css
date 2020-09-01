@@ -89,7 +89,6 @@ h1 {
 } 
 
 #agent-controls {
-    display: none;
     background: #5D3E5D;
     color: #fff;
     position: fixed;

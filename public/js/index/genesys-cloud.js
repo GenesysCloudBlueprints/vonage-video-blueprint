@@ -4,6 +4,10 @@ import view from './view.js';
 // Obtain a reference to the platformClient object
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
+client.setPersistSettings(true, 'VonageIntegration');
+
+// Client App instance
+let vonageClientApp = null;
 
 // API instances
 const usersApi = new platformClient.UsersApi();
@@ -11,54 +15,7 @@ const conversationsApi = new platformClient.ConversationsApi();
 
 let userMe = null;
 let currentConversation = null;
-let activeConversations = [];
-// array of conv ids that are currently in the process of registering.
-// helps debounce when multiple duplicate notifications come in.
-let inProcessConversations = []; 
-
-/**
- * Add conversation to global activeConversatoins and 
- * add it to the page in the navbar
- * @param {String} conversationId Genesys Cloud conversationId
- */
-function registerConversation(conversationId){
-    // If already in process then ignore
-    if(inProcessConversations.find(id => id == conversationId)) return;
-    inProcessConversations.push(conversationId);
-    
-    view.hideErrorIframe();
-
-    return conversationsApi.getConversation(conversationId)
-    .then((data) => {
-        addConversationAsTab(data);
-        activeConversations.push(data);
-
-        // Remove from inprocess
-        let idx = inProcessConversations.findIndex(id => id == conversationId);
-        inProcessConversations.splice(idx, 1);
-    });
-}
-
-/**
- * Remove conversation from global activeConversatoins and 
- * add remove from navbar
- * @param {String} conversationId Genesys Cloud conversationId
- */
-function deregisterConversation(conversationId){
-    // If already in process then ignore
-    if(inProcessConversations.find(id => id == conversationId)) return;
-    inProcessConversations.push(conversationId);
-
-    let index = activeConversations.indexOf(conversationId);
-    if (index > -1) {
-        activeConversations.splice(index, 1);
-    }
-    view.removeRoom(conversationId);
-
-    // Remove from inprocess
-    let idx = inProcessConversations.findIndex(id => id == conversationId);
-    inProcessConversations.splice(idx, 1);
-}
+let currentConversationId = '';
 
 /**
  * Add OpenTok Session ID in conversation notes
@@ -97,52 +54,6 @@ function getSessionId(conversationId){
 }
 
 /**
- * Get current active conversations
- */
-function processActiveConversations(){
-    return conversationsApi.getConversations()
-    .then((data) => {
-        let promiseArr = [];        
-
-        if(data.entities.length == 0) {
-            view.showErrorIframe('No Active Interaction');
-        } else {
-            data.entities.forEach((conv) => {
-                promiseArr.push(registerConversation(conv.id));
-            });
-        }
-    })
-}
-
-/**
- * Add the conversation into the page as a tab
- * @param {Object} conversation 
- */
-function addConversationAsTab(conversation){
-    let customer = conversation.participants.find(p => p.purpose == 'customer');
-    let tabName = customer.name ? customer.name : 'Conversation';
-
-    view.addRoom(conversation.id, tabName, userMe.name, 
-        // When tab is clicked switch the active conversation to this one
-        () => {
-            currentConversation = conversation;
-
-            // Check if vonage is activated to show/hide agent controls
-            if(conversation.vonageActive){
-                view.showAgentControls();
-            }else{
-                view.hideAgentControls();
-            }
-        }, 
-        // When start vonage button is clicked add a property to the conversation
-        () => {
-            conversation.vonageActive = true;
-            view.showAgentControls();
-        }
-    );
-}
-
-/**
  * Set-up the channel for conversations
  */
 function setupChannel(){
@@ -156,44 +67,27 @@ function setupChannel(){
             (data) => {
                 console.log(data);
                 let conversation = data.eventBody;
-                let participants = conversation.participants;
                 let conversationId = conversation.id;
                 let agentParticipant = participants.find(
                     p => p.purpose == 'agent');
                 let customerParticipant = participants.find(
                     p => p.purpose == 'customer');
 
-                    
                 // Ignore if email
                 if(agentParticipant.emails) return;
 
-                // Value to determine if conversation is already taken into account before
-                let isExisting = activeConversations.map((conv) => conv.id)
-                                    .indexOf(conversationId) != -1;
-
-                // Once agent is connected, create a room and a session
-                if(agentParticipant.connectedTime && 
-                        !agentParticipant.endTime && 
-                        !isExisting
-                    ){
-                    // Add conversationid to existing conversations array
-                    return registerConversation(conversationId);
-                }
-
                 // If chat has ended display meeting has ended
-                if(agentParticipant.endTime && isExisting){
+                if(conversationId == currentConversationId &&
+                         agentParticipant.endTime){
                     // Add OpenTok Session ID in conversation notes
                     let sessionId = getSessionId(conversationId);
                     
-                    deregisterConversation(conversationId)
-
                     if(sessionId){
                         patchConversation(conversationId, customerParticipant.id, sessionId)
                         .catch(e => console.error(e));
                     }
 
                     view.showErrorIframe('No Active Interaction');
-                    view.hideAgentControls();
                     view.uncheckScreenShare();
                 }
             });
@@ -360,6 +254,60 @@ function getCurrentCustomerEmail(){
     return customer.attributes['context.email'];
 }
 
+/**
+ * Client App SDK initialization
+ */
+function initializeClientApp(){
+    let ClientApp = window.purecloud.apps.ClientApp;
+    const env = localStorage.getItem('clientAppEnvironment');
+    if(env){
+        vonageClientApp = new ClientApp({
+            pcEnvironment: env
+        });
+    } else {
+        vonageClientApp = new ClientApp({
+            pcEnvironmentQueryParam: 'environment'
+        });
+        localStorage.setItem('clientAppEnvironment', 
+                                vonageClientApp._pcEnv.pcEnvTld);
+    }
+}
+
+/**
+ * OAuth flow
+ */
+function initializeApp(){
+    client.loginImplicitGrant(
+        '5f3e661d-61be-4a13-b536-3f54f24e26c9',
+        redirectUri, // From the global variable set by template in index.ejs
+        { state: currentConversationId })
+    .then(data => {
+        console.log(data);
+        // Assigne conversation id
+        currentConversationId = data.state;
+        
+        // Get Details of current User
+        return usersApi.getUsersMe();
+    }).then(data => {
+        userMe = data;
+    
+        // Get current conversation
+        return conversationsApi.getConversation(currentConversationId);
+    }).then((conv) => { 
+        currentConversation = conv;
+    
+        // Create the channel conversation notifications
+        return setupChannel();
+    }).then(data => {
+        view.showVonageSession(currentConversationId, userMe.name);
+    
+        console.log('Finished Setup');
+        vonageClientApp.lifecycle.bootstrapped();
+    // Error Handling
+    }).catch(e => console.log(e));
+}
+
+
 /** --------------------------------------------------------------
  *                       EVENT HANDLERS
  * -------------------------------------------------------------- */
@@ -392,24 +340,9 @@ document.getElementById('btn-send-sms')
 /** --------------------------------------------------------------
  *                       INITIAL SETUP
  * -------------------------------------------------------------- */
-client.loginImplicitGrant(
-    '5f3e661d-61be-4a13-b536-3f54f24e26c9',
-    window.location.href)
-.then(data => {
-    console.log(data);
-    
-    // Get Details of current User
-    return usersApi.getUsersMe();
-}).then(data => {
-    userMe = data;
+const urlParams = new URLSearchParams(window.location.search);
+currentConversationId = urlParams.get('conversationid');
+console.log(currentConversationId);
 
-    // Get current conversations
-    return processActiveConversations();
-}).then(() => { 
-    // Create the channel conversation notifications
-    return setupChannel();
-}).then(data => {
-    console.log('Finished Setup');
-
-// Error Handling
-}).catch(e => console.log(e));
+initializeClientApp();
+initializeApp();
