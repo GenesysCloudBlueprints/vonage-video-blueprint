@@ -52,6 +52,8 @@ The solutions engineer requires a Vonage Video account to create a project and g
 
 The Vonage Video integration has the following stages:
 
+* Create a Client Credentials OAuth Grant for Genesys Cloud.
+* Create or use existing Vonage Video API credentials.
 * Host and run the NodeJS app server.
 * Install and activate the Vonage Video integration app on Genesys Cloud.
 * Create a Genesys web chat widget and test the Vonage Video solution.
