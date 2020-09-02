@@ -16,16 +16,16 @@
   </script>
 </head>
 <body>
-  <div class="container">
-    <div class="container">
+  <div class="agent-page">
+    <div class="agent-container container-fluid">
       <div class="row">
-        <div class="col-md mx-auto">
+        <div class="col-sm mx-auto">
           <div class="text-center">Agent</div>
           <div class="stream-container mx-auto">
             <div id="publisher"></div>
           </div>
         </div>
-        <div class="col-md mx-auto">
+        <div class="col-sm mx-auto">
           <div class="text-center">Customer</div>
           <div class="stream-container mx-auto">
             <div id="subscribers"></div>
@@ -37,6 +37,10 @@
         <!-- <div id="sub-share-screen"></div> -->
       </div>
     </div>
+      <div id="empty-share-screen">
+        <img src="/img/vonage-gray.png" alt="" srcset="">
+        <p>No one is currently sharing their screen.</p>
+      </div>
   </div>
 
   <script type="module"  src="/js/vonage-room/opentok.js"></script>

@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <%- include('common/styles'); -%>
-  
+  <link rel="stylesheet" href="/css/customer-room.css">
+
   <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
   <script type="text/javascript">
       var apiKey = '<%= apiKey %>';
@@ -17,7 +18,7 @@
 <body>
   <%- include('common/header'); -%>
 
-  <div class="container">
+  <div class="container customer-room">
     <div>
       <span>Share Screen: </span>
       <label class="switch">
@@ -44,6 +45,10 @@
         <!-- <div id="pub-share-screen"></div> -->
         <!-- <div id="sub-share-screen"></div> -->
       </div>
+    </div>
+    <div id="empty-share-screen">
+      <img src="/img/vonage-white.png" alt="" srcset="">
+      <p>No one is currently sharing their screen.</p>
     </div>
   </div>
   <script type="module"  src="/js/vonage-room/opentok.js"></script>
