@@ -18,7 +18,7 @@ let publisher = null;
 let subscriber = null;
 let screenSharePublisher = null;
 let screenShareSubscriber = null;
-
+let isSharingScreen = false;
 
 // Initial setup for the page
 function setup(){
@@ -128,6 +128,7 @@ function startShareScreen(){
                     } else {
                         session.publish(screenSharePublisher, 
                             function(error) {
+                                isSharingScreen = true;
                                 if (error) console.error(error);
                             }
                         );
@@ -141,7 +142,10 @@ function startShareScreen(){
 }
 
 function stopShareScreen(){
-    screenSharePublisher.destroy();
+    if(isSharingScreen){
+        screenSharePublisher.destroy();
+        isSharingScreen = false;
+    }
 }
 
 /**
@@ -150,9 +154,13 @@ function stopShareScreen(){
 function onShareScreenStop(event){
     setTimeout(() => {
         if(!view.isAnyoneSharing()) view.hideShareScreen();
+
+        // Dirty way of switching the share screen switch off
+        let checkbox = window.parent.document.querySelector('input[type="checkbox"]');
+        checkbox.checked = false;
     }, 100);
 }
 
 setup();
 // Connect to the Session using the 'apiKey' of the application and a 'token' for permission
-// session.connect(token);
+session.connect(token);

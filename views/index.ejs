@@ -86,14 +86,14 @@
   <div id="agent-controls">
     <div class="container-fluid">    
       <div class="row">
-        <div class="col share-screen-div">
+        <div class="col-sm-4 share-screen-div">
           <span>Share Screen: </span>
           <label class="switch">
             <input type="checkbox" id="share-screen-switch">
             <span class="slider round"></span>
           </label>
         </div>
-        <div class="col">
+        <div class="col-sm">
           <span>Send Room Link:    </span>
           <button id="btn-email" type="button" class="btn btn-light">Email</button>
           <button id="btn-sms" type="button" class="btn btn-light">SMS</button>
@@ -102,23 +102,5 @@
       </div>  
     </div>
   </div>
-
-
-  <!-- Templates -->
-  <template id="tab-template">
-    <li class="nav-item">
-      <a class="nav-link">
-      </a>
-    </li>
-  </template>
-
-  <template id="room-template">
-    <div class="tab-pane fade">
-      <div class="container text-center">
-        <button type="button" class="btn-start-room">Start a Vonage Room</button>
-      </div>
-      <iframe class="room-iframe"></iframe>
-    </div>
-  </template>
 </body>
 </html>

@@ -28,12 +28,13 @@ h1 {
     border-bottom:  1px solid #ccc;
 }
 
-.empty-share-screen {
+#empty-share-screen {
     padding-top: 40px;
+    padding-bottom: 100px;
     text-align: center;
 }
 
-.empty-share-screen img {
+#empty-share-screen img {
     width: 100px;
     height: 100px;
 }
@@ -53,29 +54,16 @@ h1 {
 
 .stream-container {
     margin: 10px;
-    height: 480px;
+    height: 250px;
     transition-duration: 0.5s;
     transition-timing-function: ease;
 }
 
-@media only screen and (min-width: 767px) {
+@media only screen and (min-width: 810px) {
     .stream-container {
-        height: 250px;
+        height: 400px;
     }
 }
-
-@media only screen and (min-width: 992px) {
-    .stream-container {
-        height: 350px;
-    }
-}
-
-@media only screen and (min-width: 1216px) {
-    .stream-container {
-        height: 480px;
-    }
-}
-
 
 
 #btnShareScreenStart, #btnShareScreenStop, #btnSendURL, 
@@ -115,20 +103,31 @@ h1 {
     width: 100%;
     padding: 25px 0px;
     font-size: 1em;
+
+    transition-duration: 0.5s;
+    transition-timing-function: ease;
 }
+
+@media only screen and (max-width: 767px) {
+    #agent-controls {
+        padding: 10px;
+    }
+}
+
 
 .share-screen-div{
     padding-top: 4px;
 }
 
-@media (min-width: 576px) {
-    #agent-controls .container{
-        max-width: 580px;
-    }
-}
 
 #btn-email, #btn-sms, #btn-chat {
     width: 80px;
+}
+
+@media only screen and (max-width: 640px) {
+    #btn-email, #btn-sms, #btn-chat {
+        width: 67px;
+    }
 }
 
 #infoModalText {

@@ -4,6 +4,8 @@ export default {
         document.querySelectorAll('.stream-container').forEach(n => {
             n.classList.add('smaller-stream');
         });
+        // Hide empty share screen message
+        document.getElementById('empty-share-screen').style.display = 'none';
     },
 
     hideShareScreen(){
@@ -11,6 +13,8 @@ export default {
         document.querySelectorAll('.stream-container').forEach(n => {
             n.classList.remove('smaller-stream');
         });
+        // Hide empty share screen message
+        document.getElementById('empty-share-screen').style.display = '';
     },
 
     addPubShareScreen(){
