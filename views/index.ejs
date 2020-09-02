@@ -15,8 +15,6 @@
   <script type="module"  src="/js/index/genesys-cloud.js"></script>
 </head>
 <body>
-  <%- include('common/header'); -%>
-
   <!-- Iframe for the conversation -->
   <iframe id="conversation-iframe">
   </iframe>
@@ -84,19 +82,24 @@
     </div>
   </div>
 
-  <!-- Footer Contorls -->
+  <!-- Footer Controls -->
   <div id="agent-controls">
-    <div class="container">      
-      <span>Share Screen: </span>
-      <label class="switch">
-        <input type="checkbox" id="share-screen-switch">
-        <span class="slider round"></span>
-      </label>
-      <span>   |   </span>
-      <span>Send Room Link: </span>
-      <button id="btn-email" type="button" class="btn btn-light">Email</button>
-      <button id="btn-sms" type="button" class="btn btn-light">SMS</button>
-      <button id="btn-chat" type="button" class="btn btn-light">Chat</button>
+    <div class="container-fluid">    
+      <div class="row">
+        <div class="col share-screen-div">
+          <span>Share Screen: </span>
+          <label class="switch">
+            <input type="checkbox" id="share-screen-switch">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="col">
+          <span>Send Room Link:    </span>
+          <button id="btn-email" type="button" class="btn btn-light">Email</button>
+          <button id="btn-sms" type="button" class="btn btn-light">SMS</button>
+          <button id="btn-chat" type="button" class="btn btn-light">Chat</button>
+        </div>
+      </div>  
     </div>
   </div>
 

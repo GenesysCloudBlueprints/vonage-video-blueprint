@@ -1,3 +1,8 @@
+body {
+    color: #666 !important; 
+    font-family: Roboto !important;
+}
+
 .jumbotron {
     padding: 7px !important;
     background-color: #FF4F1F !important;
@@ -13,6 +18,24 @@ iframe {
 
 h1 {
     margin-left: 60px;
+}
+
+.agent-container {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    color: #fff;
+    background-color: #333333;
+    border-bottom:  1px solid #ccc;
+}
+
+.empty-share-screen {
+    padding-top: 40px;
+    text-align: center;
+}
+
+.empty-share-screen img {
+    width: 100px;
+    height: 100px;
 }
 
 #share-screen-container {
@@ -54,10 +77,6 @@ h1 {
 }
 
 
-/* #publisher, #subscribers, #share-screen-container, #sub-share-screen {
-    margin: 20px;
-    min-height: 400px;
-} */
 
 #btnShareScreenStart, #btnShareScreenStop, #btnSendURL, 
 #btn-email, #btn-sms, #btn-chat, 
@@ -89,13 +108,17 @@ h1 {
 } 
 
 #agent-controls {
-    background: #5D3E5D;
-    color: #fff;
+    background: #f4f4f4;
+    border-top: 1px solid #ccc;
     position: fixed;
     bottom: 0;
     width: 100%;
-    padding: 10px 0px;
+    padding: 25px 0px;
     font-size: 1em;
+}
+
+.share-screen-div{
+    padding-top: 4px;
 }
 
 @media (min-width: 576px) {
@@ -157,15 +180,15 @@ h1 {
     display: inline-block;
     width: 60px;
     height: 28px;
-  }
-  
-  .switch input { 
+}
+
+.switch input { 
     opacity: 0;
     width: 0;
     height: 0;
-  }
-  
-  .slider {
+}
+
+.slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -175,9 +198,9 @@ h1 {
     background-color: #ccc;
     -webkit-transition: .4s;
     transition: .4s;
-  }
-  
-  .slider:before {
+}
+
+.slider:before {
     position: absolute;
     content: "";
     height: 20px;
@@ -187,27 +210,27 @@ h1 {
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
-  }
-  
-  input:checked + .slider {
+}
+
+input:checked + .slider {
     background-color: #FF4F1F;
-  }
-  
-  input:focus + .slider {
+}
+
+input:focus + .slider {
     box-shadow: 0 0 1px #FF4F1F;
-  }
-  
-  input:checked + .slider:before {
+}
+
+input:checked + .slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
+}
+
+/* Rounded sliders */
+.slider.round {
     border-radius: 34px;
-  }
-  
-  .slider.round:before {
+}
+
+.slider.round:before {
     border-radius: 50%;
-  }
+}

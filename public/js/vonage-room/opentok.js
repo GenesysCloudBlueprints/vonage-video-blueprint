@@ -8,19 +8,11 @@ const elPubShareScreenId = 'pub-share-screen';
 const elSubShareScreenId = 'sub-share-screen';
 
 // Initialize an OpenTok Session object
-let session = OT.initSession(apiKey, sessionId);
+let session = null;
 
 // Initialize the camera publisher
-let publisher = OT.initPublisher(elPublisherId,
-    {
-        name: userName,
-        height: '100%',
-        width: '100%',
-        showControls: true,
-        style: {
-            nameDisplayMode: 'on'
-        }
-    });
+let publisher = null;
+
 
 // For this demo we're just assuming one customer
 let subscriber = null;
@@ -30,6 +22,9 @@ let screenShareSubscriber = null;
 
 // Initial setup for the page
 function setup(){
+    // Initialize an OpenTok Session object
+    initializeTokbox();
+
     view.hideShareScreen();
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -42,6 +37,63 @@ function setup(){
                 stopShareScreen();
             }
         });
+    });
+}
+
+function initializeTokbox(){
+    session = OT.initSession(apiKey, sessionId);
+    publisher = OT.initPublisher(elPublisherId,
+        {
+            name: userName,
+            height: '100%',
+            width: '100%',
+            showControls: true,
+            style: {
+                nameDisplayMode: 'on'
+            }
+        });
+    // Attach event handlers
+    session.on({
+        // This function runs when session.connect() asynchronously completes
+        sessionConnected: function () {
+            // Publish the publisher we initialzed earlier (this will trigger 'streamCreated' on other
+            // clients)
+            session.publish(publisher);
+        },
+
+        // This function runs when another client publishes a stream (eg. session.publish())
+        streamCreated: function (event) {
+            let subOptions = {
+                appendMode: 'append',
+                showControls: true,
+                width: '100%',
+                height: '100%',
+                style: {
+                    nameDisplayMode: 'on'
+                }
+            };
+        
+            // Set subscriber objects to global reference
+            if( event.stream.videoType === 'screen'){
+                // Screen share
+                view.addSubShareScreen();
+                screenShareSubscriber = session.subscribe(
+                    event.stream, elSubShareScreenId, subOptions);
+                screenShareSubscriber.on('destroyed', onShareScreenStop);
+                view.showShareScreen();
+            } else {
+                // Subscriber main/camera
+                subscriber = session.subscribe(
+                    event.stream, elSubscribersId, subOptions);
+            }
+        },
+
+        streamDestroyed: function (event) {
+            if (event.reason == 'clientDisconnected' && 
+                    event.stream.videoType == 'camera'){
+                window.close();
+            }
+        }
     });
 }
 
@@ -101,50 +153,6 @@ function onShareScreenStop(event){
     }, 100);
 }
 
-// Attach event handlers
-session.on({
-    // This function runs when session.connect() asynchronously completes
-    sessionConnected: function () {
-        // Publish the publisher we initialzed earlier (this will trigger 'streamCreated' on other
-        // clients)
-        session.publish(publisher);
-    },
-
-    // This function runs when another client publishes a stream (eg. session.publish())
-    streamCreated: function (event) {
-        let subOptions = {
-            appendMode: 'append',
-            showControls: true,
-            width: '100%',
-            height: '100%',
-            style: {
-                nameDisplayMode: 'on'
-            }
-        };
-    
-        // Set subscriber objects to global reference
-        if( event.stream.videoType === 'screen'){
-            // Screen share
-            view.addSubShareScreen();
-            screenShareSubscriber = session.subscribe(
-                event.stream, elSubShareScreenId, subOptions);
-            screenShareSubscriber.on('destroyed', onShareScreenStop);
-            view.showShareScreen();
-        } else {
-            // Subscriber main/camera
-            subscriber = session.subscribe(
-                event.stream, elSubscribersId, subOptions);
-        }
-    },
-
-    streamDestroyed: function (event) {
-        if (event.reason == 'clientDisconnected' && 
-                event.stream.videoType == 'camera'){
-            window.close();
-        }
-    }
-});
-
 setup();
 // Connect to the Session using the 'apiKey' of the application and a 'token' for permission
-session.connect(token);
+// session.connect(token);
