@@ -22,6 +22,8 @@ This Genesys Blueprint provides instructions for deploying Vonage Video on Genes
 
 Genesys Cloud uses **a standalone integration / the Interaction Widget** to provide customers with a Vonage Video interaction.
 
+![Flowchart](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/flowchart.png "Flowchart")
+
 ## Sample Application Features
 
 - **Interaction Widget / Standalone Integration** - Uses the Genesys Cloud's Interaction Widget or a standalone integration widget to enable the agent to start a Vonage room inside Genesys Cloud.
@@ -120,17 +122,29 @@ TODO: To be filled onced listing is available in the AppFoundry Market.
 
 Once the agent is offered/answers the incoming interaction, they sould see the Vonage panel in one of the Agent tools section.
 
-TODO: Screenshot
+![1](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/1.png "1")
+
+![2](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/2.png "2")
 
 Clicking it will take them to a Vonage room. The agent could then invite the customer by sending the link through 3 different channels: SMS, Email, or Chat (If the conversation is a chat interaction).
 
-TODO: Screenshot
+![3](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/3.png "3")
+
+![4](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/4.png "4")
+
+Client view of the room:
+
+![5](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/5.png "5")
 
 The agent or the customer could initiate screen sharing of their devices.
 
-TODO: Screenshot
+![6](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/6.png "6")
+
+![7](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/7.png "7")
 
 ## Troubleshooting
+
+For troubleshooting information, see the [Vonage Video Troubleshooting](https://support.tokbox.com/hc/en-us/sections/360004890311-Troubleshooting).
 
 ## Additional Resources
 
