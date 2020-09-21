@@ -13,7 +13,7 @@
     - [Create a Client Credentials OAuth Grant for Genesys Cloud](#create-a-client-credentials-oauth-grant-for-genesys-cloud)
     - [Create or use existing Vonage Video API credentials](#create-or-use-existing-vonage-video-api-credentials)
     - [Run the NodeJS web server](#run-the-nodejs-web-server)
-    - [Install and activate the Vonage Video integration app on Genesys Cloud.](#install-and-activate-the-vonage-video-integration-app-on-genesys-cloud)
+    - [Setup an Interaction Widget integration in Genesys Cloud](#setup-an-interaction-widget-integration-in-genesys-cloud)
   - [Testing the solution using Genesys Cloud Web Chats Developer Tool](#testing-the-solution-using-genesys-cloud-web-chats-developer-tool)
   - [Troubleshooting](#troubleshooting)
   - [Additional Resources](#additional-resources)
@@ -110,9 +110,61 @@ Open a terminal in the project directory and run the server by entering:
 node server
 ```
 
-### Install and activate the Vonage Video integration app on Genesys Cloud.
+### Setup an Interaction Widget integration in Genesys Cloud
 
-TODO: To be filled onced listing is available in the AppFoundry Market.
+1. Login to your Genesys Cloud organization and add a new **Integration**.
+
+![1](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/integration-1.png "1")
+
+1. Install the Interaction Widget.
+
+![2](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/integration-2.png "2")
+
+3. (Optional) Use the Name box to give the app a different name.
+
+![3](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/integration-3.png "3")
+
+4. Click the **Configuration Tab**. If you're testing the project out of the box, type in the URL:
+
+```
+https://localhost/?conversationid={{pcConversationId}}&language={{pcLangTag}}&environment={{pcEnvironment}}
+```
+
+Select a group for filtering user acces to the widget.
+
+(Optional) Select specific queues for widget access.
+
+Select the ACD interaction types where you want the widget to be available for.
+
+5. Go to **Advanced** Configuration and enter this in the text area:
+
+```json
+{
+  "lifecycle": {
+    "ephemeral": false,
+    "hooks": {
+      "stop": true,
+      "focus": true,
+      "blur": true,
+      "bootstrap": true
+    }
+  },
+  "icon": {
+    "48x48": "https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/public/img/logo-48x48.png",
+    "24x24": "https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/public/img/logo-24x24.png",
+    "96x96": "https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/public/img/96x96.png",
+    "128x128": "https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/public/img/128x128.png",
+    "256x256": "https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/public/img/256x256.png"
+  },
+  "monochromicIcon": {
+    "vector": "https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/public/img/vonage-logo.svg"
+  }
+}
+```
+
+6. **Save** and **Activate** the integration.
+
+![4](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/integration-4.png "4")
 
 ## Testing the solution using Genesys Cloud Web Chats Developer Tool
 
@@ -131,6 +183,7 @@ Clicking it will take them to a Vonage room. The agent could then invite the cus
 ![3](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/3.png "3")
 
 ![4](https://github.com/GenesysAppFoundry/genesyscloud-vonage/raw/master/blog/4.png "4")
+
 
 Client view of the room:
 
