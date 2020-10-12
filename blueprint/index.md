@@ -116,7 +116,7 @@ node server
 
 ![1](images/integration-1.png "1")
 
-1. Install the Interaction Widget.
+2. Install the Interaction Widget.
 
 ![2](images/integration-2.png "2")
 
