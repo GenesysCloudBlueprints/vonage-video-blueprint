@@ -1,24 +1,8 @@
 # Deployment Guide for Vonage Video on Genesys Cloud
 
-- [Deployment Guide for Vonage Video on Genesys Cloud](#deployment-guide-for-vonage-video-on-genesys-cloud)
-  - [Sample Application Features](#sample-application-features)
-  - [Solution components](#solution-components)
-    - [Software Development Kit (SDK)](#software-development-kit-sdk)
-  - [Requirements](#requirements)
-    - [Specialized knowledge](#specialized-knowledge)
-    - [Genesys Cloud account requirements](#genesys-cloud-account-requirements)
-    - [Vonage account requirements](#vonage-account-requirements)
-  - [Run Locally](#run-locally)
-    - [Download the repository containing the project files](#download-the-repository-containing-the-project-files)
-    - [Create a Client Credentials OAuth Grant for Genesys Cloud](#create-a-client-credentials-oauth-grant-for-genesys-cloud)
-    - [Create or use existing Vonage Video API credentials](#create-or-use-existing-vonage-video-api-credentials)
-    - [Run the NodeJS web server](#run-the-nodejs-web-server)
-    - [Setup an Interaction Widget integration in Genesys Cloud](#setup-an-interaction-widget-integration-in-genesys-cloud)
-  - [Testing the solution using Genesys Cloud Web Chats Developer Tool](#testing-the-solution-using-genesys-cloud-web-chats-developer-tool)
-  - [Troubleshooting](#troubleshooting)
-  - [Additional Resources](#additional-resources)
-
 This Genesys Blueprint provides instructions for deploying Vonage Video on Genesys Cloud. The Vonage Video API (formerly TokBox OpenTok) makes it easy to embed high-quality interactive video, voice, messaging, and screen sharing into web and mobile apps. For more info on how the video platform works, check out [Video API Basics](https://tokbox.com/developer/guides/basics/).
+
+[toc]
 
 Genesys Cloud uses **Interaction Widget** to provide customers with a Vonage Video interaction.
 
