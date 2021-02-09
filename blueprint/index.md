@@ -1,5 +1,6 @@
 ---
 title: Deployment Guide for Vonage Video on Genesys Cloud
+author: prince.merluza
 indextype: blueprint
 icon: blueprint
 category: 6
