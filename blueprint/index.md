@@ -121,10 +121,10 @@ node server
 4. Click the **Configuration Tab**. If you're testing the project out of the box, type in the URL:
 
 ```
-https://localhost/?conversationid={pcConversationId}&language={pcLangTag}&environment={pcEnvironment}
+https://localhost/?conversationid={{pcConversationId}}&language={{pcLangTag}}&environment={{pcEnvironment}}
 ```
 
-Select a group for filtering user acces to the widget.
+Select a group for filtering user access to the widget.
 
 (Optional) Select specific queues for widget access.
 
@@ -166,7 +166,7 @@ Select the ACD interaction types where you want the widget to be available for.
 2. Go to Genesys Cloud [Developer Tools](https://developer.mypurecloud.com/developer-tools/#/webchat).
 3. Select your deployment and queue and initiate a chat interaction.
 
-Once the agent is offered/answers the incoming interaction, they sould see the Vonage panel in one of the Agent tools section.
+Once the agent is offered/answers the incoming interaction, they should see the Vonage panel in one of the Agent tools section.
 
 ![1](images/1.png "1")
 
