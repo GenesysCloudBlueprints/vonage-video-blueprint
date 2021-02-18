@@ -79,7 +79,7 @@ app.post('/sendlinktosms', async (req, res) => {
 
 
 httpsServer.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`Example app listening at https://localhost:${port}`);
     console.log(`Test Mode: ${config.testMode ? 'ON' : 'OFF'}`);
 });
 

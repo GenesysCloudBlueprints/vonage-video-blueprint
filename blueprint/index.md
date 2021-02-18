@@ -101,7 +101,7 @@ The project contains two NodeJS scripts:
 Open a terminal in the project directory and run the server by entering:
 
 ```
-node server
+npm run start-server
 ```
 
 ### Setup an Interaction Widget integration in Genesys Cloud

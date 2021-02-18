@@ -118,6 +118,7 @@ function sendSMS(body){
 }
 
 // INITIAL SETUP
+client.setEnvironment(config.genesysCloud.region);
 client.loginClientCredentialsGrant(
     config.genesysCloud.clientId,
     config.genesysCloud.clientSecret

@@ -8,6 +8,11 @@ module.exports = {
     },
 
     genesysCloud: {
+        // Genesys Cloud region
+        // eg. 'mypurecloud.ie', 'euw2.pure.cloud', etc...
+        region: 'mypurecloud.com',
+
+        // Client Credentials OAuth
         clientId: '',
         clientSecret: ''
     }
