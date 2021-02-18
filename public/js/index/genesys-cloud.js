@@ -164,51 +164,62 @@ function sendLinkToEmail(address){
     view.hideEmailModal();
     view.showInfoModal('Sending Link...');
 
-    const queueId = '4750048b-1994-41d4-8410-a5760c49a6cd';
+    // emailQueueID is passed from server as a window global variable.
+    const queueId = emailQueueID;
 
-    const emailConvBody = {
-        queueId: '4750048b-1994-41d4-8410-a5760c49a6cd',
-        provider: 'PureCloud Email',
-        toAddress: address,
-        direction: 'OUTBOUND'
-    }
+    return new Promise((resolve, reject) => {
+        if (!queueId) {
+            view.showInfoModal('No queue has been configured for sending the Email invitation.');
+            reject();
+        } 
 
-    const emailBody = {
-        to: [
-           {
-              email: address
-           }
-        ],
-        subject: 'Vonage Room Invitation',
-        textBody: getInvitationMessage()
-    }
-
-    let conversationId = '';
-
-    return conversationsApi.postConversationsEmails(emailConvBody)
-    .then((data) => {
-        conversationId = data.id;
-
-        return conversationsApi
-                .postConversationsEmailMessages(conversationId, emailBody);
-    })
-    .then((data) => {
-
-        return conversationsApi.getConversation(conversationId);
-    })
-    .then((conversation) => {
-        let agent = conversation.participants.find(p => p.purpose == 'agent');
-
-        return conversationsApi
-                .patchConversationsEmailParticipant(conversationId, agent.id, {
-                    state: 'disconnected',
-                    wrapupSkipped: true
-                })
-    })
-    .then(() => {
-        view.showInfoModal('Link sent!');
-    })
-    .catch((e) => console.error(e));
+        const emailConvBody = {
+            queueId: queueId,
+            provider: 'PureCloud Email',
+            toAddress: address,
+            direction: 'OUTBOUND'
+        }
+    
+        const emailBody = {
+            to: [
+               {
+                  email: address
+               }
+            ],
+            subject: 'Vonage Room Invitation',
+            textBody: getInvitationMessage()
+        }
+    
+        let conversationId = '';
+    
+        conversationsApi.postConversationsEmails(emailConvBody)
+        .then((data) => {
+            conversationId = data.id;
+    
+            return conversationsApi
+                    .postConversationsEmailMessages(conversationId, emailBody);
+        })
+        .then((data) => {
+            return conversationsApi.getConversation(conversationId);
+        })
+        .then((conversation) => {
+            let agent = conversation.participants.find(p => p.purpose == 'agent');
+    
+            return conversationsApi
+                    .patchConversationsEmailParticipant(conversationId, agent.id, {
+                        state: 'disconnected',
+                        wrapupSkipped: true
+                    })
+        })
+        .then(() => {
+            view.showInfoModal('Link sent!');
+            resolve();
+        })
+        .catch((e) => {
+            console.error(e);
+            reject();
+        });
+    });
 }
 
 /**

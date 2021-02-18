@@ -29,7 +29,8 @@ app.set('view engine', 'ejs');
 
 app.get('/', async (req, res) => {
     res.render('index.ejs', {
-        redirectUri: 'https://localhost/'
+        redirectUri: 'https://localhost/',
+        emailQueueID: config.genesysCloud.emailQueueID
     });
 });
 

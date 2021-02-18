@@ -14,6 +14,10 @@ module.exports = {
 
         // Client Credentials OAuth
         clientId: '',
-        clientSecret: ''
+        clientSecret: '',
+
+        // Required when sending invitation through email, 
+        // the outbound email will go through this ACD queue. 
+        emailQueueID: ''
     }
 }
