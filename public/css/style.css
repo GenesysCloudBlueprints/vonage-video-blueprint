@@ -11,7 +11,7 @@ body {
 }
 
 iframe {
-    height: -webkit-fill-available;
+    height: 430px;
     width: -webkit-fill-available;
     border: none !important;
 }
