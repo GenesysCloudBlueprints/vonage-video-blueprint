@@ -6,6 +6,9 @@ const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
 client.setPersistSettings(true, 'VonageIntegration');
 
+// Constants
+const ENV_QUERY_PARAM = 'environment';
+
 // Client App instance
 let vonageClientApp = null;
 
@@ -13,6 +16,7 @@ let vonageClientApp = null;
 const usersApi = new platformClient.UsersApi();
 const conversationsApi = new platformClient.ConversationsApi();
 
+// Globals
 let userMe = null;
 let currentConversation = null;
 let currentConversationId = '';
@@ -270,34 +274,38 @@ function getCurrentCustomerEmail(){
  */
 function initializeClientApp(){
     let ClientApp = window.purecloud.apps.ClientApp;
-    const env = localStorage.getItem('clientAppEnvironment');
-    if(env){
-        vonageClientApp = new ClientApp({
-            pcEnvironment: env
-        });
-    } else {
-        vonageClientApp = new ClientApp({
-            pcEnvironmentQueryParam: 'environment'
-        });
-        localStorage.setItem('clientAppEnvironment', 
-                                vonageClientApp._pcEnv.pcEnvTld);
+    let envParam = urlParams.get(ENV_QUERY_PARAM);
+
+    if(!envParam){
+        envParam = localStorage.getItem('clientAppEnvironment') || 'mypurecloud.com';
     }
+    vonageClientApp = new ClientApp({ pcEnvironment: envParam });
+    localStorage.setItem('clientAppEnvironment', envParam);
 }
 
 /**
  * OAuth flow
  */
 function initializeApp(){
-    client.loginImplicitGrant(
+    // Determine environment for Genesys Cloud
+    let gCloudEnv = urlParams.get(ENV_QUERY_PARAM);
+    if(!gCloudEnv){
+        gCloudEnv = localStorage.getItem('clientAppEnvironment') || 'mypurecloud.com';
+    }
+    localStorage.setItem('clientAppEnvironment', gCloudEnv);
+
+    client.setEnvironment(gCloudEnv);
+    return client.loginImplicitGrant(
         // redirectURI and clientID passed by server through global window variables
         implicitGrantID,
         redirectURI, 
         { state: currentConversationId })
     .then(data => {
         console.log(data);
-        // Assigne conversation id
+        // Assign conversation id
         currentConversationId = data.state;
-        
+        console.log(`Conversation ID: ${currentConversationId}`);
+
         // Get Details of current User
         return usersApi.getUsersMe();
     }).then(data => {
@@ -313,10 +321,8 @@ function initializeApp(){
     }).then(data => {
         view.showVonageSession(currentConversationId, userMe.name);
     
-        console.log('Finished Setup');
         vonageClientApp.lifecycle.bootstrapped();
-    // Error Handling
-    }).catch(e => console.log(e));
+    })
 }
 
 
@@ -354,7 +360,11 @@ document.getElementById('btn-send-sms')
  * -------------------------------------------------------------- */
 const urlParams = new URLSearchParams(window.location.search);
 currentConversationId = urlParams.get('conversationid');
-console.log(`Conversation ID: ${currentConversationId}`);
+
 
 initializeClientApp();
-initializeApp();
+initializeApp()
+.then(() => {
+    console.log('App successfully initialized.')
+})
+.catch(e => console.error(e));
