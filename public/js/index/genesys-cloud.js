@@ -320,8 +320,6 @@ function initializeApp(){
         return setupChannel();
     }).then(data => {
         view.showVonageSession(currentConversationId, userMe.name);
-    
-        vonageClientApp.lifecycle.bootstrapped();
     })
 }
 
@@ -361,10 +359,13 @@ document.getElementById('btn-send-sms')
 const urlParams = new URLSearchParams(window.location.search);
 currentConversationId = urlParams.get('conversationid');
 
-
-initializeClientApp();
-initializeApp()
-.then(() => {
-    console.log('App successfully initialized.')
+window.addEventListener('load', () => {
+    initializeClientApp();
+    initializeApp()
+    .then(() => {
+        console.log('App initialized.');
+        vonageClientApp.lifecycle.bootstrapped();
+    })
+    .catch(e => console.error(e));
 })
-.catch(e => console.error(e));
+

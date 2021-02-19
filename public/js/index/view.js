@@ -21,7 +21,6 @@ export default {
     },
 
     showEmailModal(email){
-        console.log(email);
         if(email){
             document.getElementById('emailModal')
                 .querySelectorAll('input')[0].value = email;
