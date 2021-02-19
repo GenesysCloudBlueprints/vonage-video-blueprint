@@ -289,8 +289,9 @@ function initializeClientApp(){
  */
 function initializeApp(){
     client.loginImplicitGrant(
-        '5f3e661d-61be-4a13-b536-3f54f24e26c9',
-        redirectUri, // From the global variable set by template in index.ejs
+        // redirectURI and clientID passed by server through global window variables
+        implicitGrantID,
+        redirectURI, 
         { state: currentConversationId })
     .then(data => {
         console.log(data);
@@ -353,7 +354,7 @@ document.getElementById('btn-send-sms')
  * -------------------------------------------------------------- */
 const urlParams = new URLSearchParams(window.location.search);
 currentConversationId = urlParams.get('conversationid');
-console.log(currentConversationId);
+console.log(`Conversation ID: ${currentConversationId}`);
 
 initializeClientApp();
 initializeApp();

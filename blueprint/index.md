@@ -80,16 +80,26 @@ The Vonage Video integration has the following stages:
 
 1. Go to the [repository](https://github.com/GenesysAppFoundry/genesyscloud-vonage) and clone it to your machine.
 
+### Create an Implicit Grant OAuth
+
+1. Login to your Genesys Cloud organization and create a new OAuth API (Implicit Grant). [Create an OAuth Client](https://help.mypurecloud.com/articles/create-an-oauth-client/)
+2. Take note of the Client ID. It will be used in the configuration of the project.
+
 ### Create a Client Credentials OAuth Grant for Genesys Cloud
 
 1. Login to your Genesys Cloud organization and create a new OAuth API (Client Credentials Grant). [Create an OAuth Client](https://help.mypurecloud.com/articles/create-an-oauth-client/)
 2. Set the admin role for the OAuth client.
-3. Modify [config.js](https://github.com/MyPureCloud/vonage-video-blueprint/blob/master/config.js) from the blueprint repository and enter the credentials for Genesys Cloud.  
+3. Take note of the Client ID and Client Secret.
 
 ### Create or use existing Vonage Video API credentials
 
 1. Create or open an existing Vonage Video project from your Vonage account. The project needs to be a Custom Project (OpenTok API) and not an Embed Project.
-2. Take note of the Project API Key and Project secret, then modify [config.js](https://github.com/MyPureCloud/vonage-video-blueprint/blob/master/config.js) with those values.
+2. Take note of the Project API Key and Project secret.
+
+### Create a configuration file
+
+1. In the project directory, make a copy of the [sample-config.js](https://github.com/MyPureCloud/vonage-video-blueprint/blob/master/sample-config.js) file and rename it to **config.js**.
+2. Enter the values required in the file.
 
 ### Run the NodeJS web server
 

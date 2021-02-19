@@ -28,10 +28,20 @@ app.use(express.static(__dirname + '/public')); //
 app.set('view engine', 'ejs');
 
 app.get('/', async (req, res) => {
-    res.render('index.ejs', {
-        redirectUri: 'https://localhost/',
-        emailQueueID: config.genesysCloud.emailQueueID
-    });
+    let appURI = config.appURI;
+    let emailQueueID = config.genesysCloud.emailQueueID
+    let implicitGrantID = config.genesysCloud.implicitGrantID
+
+    if (!appURI || !implicitGrantID){
+        console.error('Some configuration items empty.')
+        res.status(500).end();
+    } else {
+        res.render('index.ejs', {
+            redirectURI: appURI,
+            emailQueueID: emailQueueID,
+            implicitGrantID: implicitGrantID
+        });
+    }
 });
 
 // Create a session if not yet created
