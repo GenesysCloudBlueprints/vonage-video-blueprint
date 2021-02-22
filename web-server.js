@@ -37,7 +37,7 @@ app.get('/', async (req, res) => {
         res.status(500).end();
     } else {
         res.render('index.ejs', {
-            redirectURI: appURI,
+            appURI: appURI,
             emailQueueID: emailQueueID,
             implicitGrantID: implicitGrantID
         });

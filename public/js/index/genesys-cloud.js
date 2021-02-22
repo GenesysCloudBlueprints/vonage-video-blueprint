@@ -21,6 +21,7 @@ let userMe = null;
 let currentConversation = null;
 let currentConversationId = '';
 
+
 /**
  * Add OpenTok Session ID in conversation notes
  * @param {String} conversationId 
@@ -106,7 +107,7 @@ function getInvitationMessage(){
     const customerParticipant = currentConversation.participants.find(p => 
         p.purpose == 'customer');
     const customerName = customerParticipant.name || '<No Name>';
-    const message = `Please join my Vonage Video Room at: https://localhost/room/customer/${conversationId}?username=${encodeURIComponent(customerName)}`;
+    const message = `Please join my Vonage Video Room at: ${appURI.replace(/\/+$/, '')}/room/customer/${conversationId}?username=${encodeURIComponent(customerName)}`;
     
     return message;
 }
@@ -147,7 +148,7 @@ function sendLinkToChat(){
             conversationId,
             communicationId,
             {
-                body: `Please join my Vonage Video Room at: https://localhost/room/customer/${conversationId}?username=${encodeURIComponent(customerName)}`,
+                body: `Please join my Vonage Video Room at: ${appURI.replace(/\/+$/, '')}/room/customer/${conversationId}?username=${encodeURIComponent(customerName)}`,
                 bodyType: 'standard'
             }
         )
@@ -234,7 +235,7 @@ function sendLinkToSMS(address){
     view.hideSMSModal();
     view.showInfoModal('Sending Link...');
 
-    return fetch('https://localhost/sendlinktosms', {
+    return fetch(`${appURI.replace(/\/+$/, '')}/sendlinktosms`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -298,7 +299,7 @@ function initializeApp(){
     return client.loginImplicitGrant(
         // redirectURI and clientID passed by server through global window variables
         implicitGrantID,
-        redirectURI, 
+        appURI, 
         { state: currentConversationId })
     .then(data => {
         console.log(data);

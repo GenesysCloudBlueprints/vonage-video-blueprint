@@ -1,7 +1,7 @@
 export default {
     showVonageSession(conversationId, agentName){
         let iframe = document.getElementById('conversation-iframe');
-        iframe.src = `https://localhost/room/agent/${conversationId}?username=${agentName}`
+        iframe.src = `${appURI.replace(/\/+$/, '')}/room/agent/${conversationId}?username=${agentName}`
     },
 
     /**
