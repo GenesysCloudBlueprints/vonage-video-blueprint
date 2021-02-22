@@ -82,13 +82,15 @@ The Vonage Video integration has the following stages:
 
 ### Create an Implicit Grant OAuth
 
-1. Login to your Genesys Cloud organization and create a new OAuth API (Implicit Grant). [Create an OAuth Client](https://help.mypurecloud.com/articles/create-an-oauth-client/)
-2. Take note of the Client ID. It will be used in the configuration of the project.
+1. Login to your Genesys Cloud organization and create a new OAuth Credential (Implicit Grant). [Create an OAuth Client](https://help.mypurecloud.com/articles/create-an-oauth-client/)
+2. Add **https://localhost/** to the **Authorized redirect URIs**. Note: If you've changed the **redirecUri** value in the config file, then you need to add that new URI instead.
+3. In the Scope section, add **users**, **conversations** and **notifications**.
+4. Take note of the Client ID. It will be used in the configuration of the project.
 
 ### Create a Client Credentials OAuth Grant for Genesys Cloud
 
-1. Login to your Genesys Cloud organization and create a new OAuth API (Client Credentials Grant). [Create an OAuth Client](https://help.mypurecloud.com/articles/create-an-oauth-client/)
-2. Set the admin role for the OAuth client.
+1. Login to your Genesys Cloud organization and create a new OAuth Credential (Client Credentials Grant). [Create an OAuth Client](https://help.mypurecloud.com/articles/create-an-oauth-client/)
+2. Select all of the admin **roles** for the OAuth client.
 3. Take note of the Client ID and Client Secret.
 
 ### Create or use existing Vonage Video API credentials
@@ -136,7 +138,7 @@ https://localhost/?conversationid={pcConversationId}&language={pcLangTag}&enviro
 
 Select a group for filtering user access to the widget.
 
-(Optional) Select specific queues for widget access.
+Select specific queues for widget access.
 
 Select the ACD interaction types where you want the widget to be available for.
 
