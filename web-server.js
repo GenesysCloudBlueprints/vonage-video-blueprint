@@ -17,18 +17,19 @@ const sslOptions = {
 };
 const httpsServer = https.createServer(sslOptions, app);
 
+// Constants
+const appURI = config.appURI;
+
 // Parsers
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Initialize the express app
-app.use(express.static(__dirname + '/public')); //
-
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+app.use(express.static(__dirname + '/public')); 
+
 app.get('/', async (req, res) => {
-    let appURI = config.appURI;
     let emailQueueID = config.genesysCloud.emailQueueID
     let implicitGrantID = config.genesysCloud.implicitGrantID
 
@@ -50,10 +51,14 @@ app.get('/room/agent/:conversation_id', async (req, res) => {
     let userName = req.query.username || 'N/A';
 
     vonageApp.createRoom(conversation_id, userName)
-    .then((data) => {
-        res.render('agent-room.ejs', data);
+    .then((vonageData) => {
+        res.render('agent-room.ejs', {
+            vonageData: vonageData,
+            appURI: appURI
+        });
     })
     .catch((e) => {
+        console.error(e);
         res.render('error.ejs', {});
     })
 });
@@ -64,8 +69,11 @@ app.get('/room/customer/:conversation_id', async (req, res) => {
     let userName = req.query.username || 'N/A';
 
     vonageApp.createRoom(conversation_id, userName)
-    .then((data) => {
-        res.render('customer-room.ejs', data);
+    .then((vonageData) => {
+        res.render('customer-room.ejs', {
+            vonageData: vonageData,
+            appURI: appURI
+        });
     })
     .catch((e) => {
         res.render('error.ejs', {});
@@ -86,9 +94,10 @@ app.post('/sendlinktosms', async (req, res) => {
         console.log(err);
         res.status(400);
     })
-})
+})    
 
 
+// Run Node server
 httpsServer.listen(port, () => {
     console.log(`Example app listening at https://localhost:${port}`);
     console.log(`Test Mode: ${config.testMode ? 'ON' : 'OFF'}`);

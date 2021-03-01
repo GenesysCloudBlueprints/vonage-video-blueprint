@@ -4,15 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="<%= appURI.replace(/\/+$/, '') %>/css/style.css">
   <%- include('common/styles'); -%>
+  
   
   <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
   <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
   <script type="text/javascript">
-      var apiKey = '<%= apiKey %>';
-      var sessionId = '<%= sessionId %>';
-      var token = '<%= token %>';
-      var userName = '<%= userName %>';
+      var apiKey = '<%= vonageData.apiKey %>';
+      var sessionId = '<%= vonageData.sessionId %>';
+      var token = '<%= vonageData.token %>';
+      var userName = '<%= vonageData.userName %>';
   </script>
 </head>
 <body>
@@ -38,11 +40,11 @@
       </div>
     </div>
       <div id="empty-share-screen">
-        <img src="/img/vonage-gray.png" alt="" srcset="">
+        <img src="<%= appURI.replace(/\/+$/, '') %>/img/vonage-gray.png" alt="" srcset="">
         <p>No one is currently sharing their screen.</p>
       </div>
   </div>
 
-  <script type="module"  src="/js/vonage-room/opentok.js"></script>
+  <script type="module"  src="<%= appURI.replace(/\/+$/, '') %>/js/vonage-room/opentok.js"></script>
 </body>
 </html>
