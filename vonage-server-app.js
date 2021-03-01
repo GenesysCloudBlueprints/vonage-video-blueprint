@@ -16,6 +16,7 @@ const opentok = new OpenTok(apiKey, apiSecret);
 // Genesys Cloud Credentials
 const client = platformClient.ApiClient.instance;
 const conversationsApi = new platformClient.ConversationsApi();
+let tokenInfo = {};
 
 // Dictionary of sessions
 // Key: conversation ID. Value: Session ID
@@ -55,7 +56,7 @@ function _createSession(){
  * @param {String} userName Name of the agent
  * @returns {Promise<Object>} Promise representing Vonage Video details to be passed to the client app 
  */
-async function createRoom(conversationId, userName){
+async function _createRoom(conversationId, userName){
     let conversationActive = await _isConversationActive(conversationId);
 
     let sessionId = sessions[conversationId];
@@ -88,8 +89,9 @@ async function createRoom(conversationId, userName){
 /**
  * Send a link of the Vonage Room via Genesys Cloud Agentless SMS.
  * @param {Object} body information about the SMS to be sent 
+ * @returns {Promise}
  */
-function sendSMS(body){
+async function _sendSMS(body){
     console.log('Sending SMS invitation...');
 
     return new Promise((resolve, reject) => {
@@ -120,20 +122,51 @@ function sendSMS(body){
     })
 }
 
-// INITIAL SETUP
-client.setEnvironment(config.genesysCloud.region);
-client.loginClientCredentialsGrant(
-    config.genesysCloud.clientID,
-    config.genesysCloud.clientSecret
-)
-.then(() => {
-    console.log('Genesys Cloud client credentials grant succeeded.')
-})
-.catch((err) => {
-    console.log(err);
-});
+/**
+ * Checks if token is expired and requests a new one
+ */
+function _refreshGenesysCloudCredentials(){
+    client.setEnvironment(config.genesysCloud.region);
+    
+    return client.loginClientCredentialsGrant(
+        config.genesysCloud.clientID,
+        config.genesysCloud.clientSecret
+    )
+    .then((data) => {
+        console.log(data);
+        tokenInfo = data;
+        console.log(`Genesys Cloud authenticated. Token: ${tokenInfo.accessToken}`)
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+}
+
+/**
+ * Function generator. Encapsulates all exposed methods to first check
+ * the status of the Genesys Cloud token. Refresh credentials if needed.
+ */
+function executeFunction(f){
+    // The time difference between token expiration and now (ms) 
+    // if less than, refresh the token.
+    const timeDiffToRefresh = 3600000;
+
+    let func = async (...args) => {
+        if(!tokenInfo.tokenExpiryTime || (tokenInfo.tokenExpiryTime - Date.now()) <= timeDiffToRefresh){
+            console.log('Refreshing Genesys Cloud Credentials...')
+            await _refreshGenesysCloudCredentials();
+        }
+
+        return f(...args);
+    }
+
+    return func;
+}
+
+// Authenticat with GCloud on server startup
+_refreshGenesysCloudCredentials();
 
 module.exports = {
-    createRoom: createRoom,
-    sendSMS: sendSMS
+    createRoom: executeFunction(_createRoom),
+    sendSMS: executeFunction(_sendSMS)
 }
