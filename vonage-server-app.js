@@ -90,8 +90,12 @@ async function createRoom(conversationId, userName){
  * @param {Object} body information about the SMS to be sent 
  */
 function sendSMS(body){
+    console.log('Sending SMS invitation...');
+
     return new Promise((resolve, reject) => {
-        if(!body.conversationId || !body.address || !body.message) 
+        let smsAddress = config.genesysCloud.smsFromAddress;
+
+        if(!body.conversationId || !body.address || !body.message || smsAddress.length <= 0) 
             reject();
     
         // Check if in a session
@@ -99,22 +103,21 @@ function sendSMS(body){
     
         // Send agentless SMS
         let smsBody = {
-            fromAddress: '+13175763352',
+            fromAddress: smsAddress,
             toAddress: body.address,
             toAddressMessengerType: 'sms',
             textBody: body.message
         }
     
         return conversationsApi.postConversationsMessagesAgentless(smsBody)
-        
+        .then((data) => {
+            console.log('SMS sent');
+            resolve();
+        })
+        .catch((err) => {
+            reject(err);
+        });
     })
-    .then((data) => {
-        console.log('SMS sent');
-        resolve();
-    })
-    .catch((err) => {
-        reject(err);
-    });
 }
 
 // INITIAL SETUP

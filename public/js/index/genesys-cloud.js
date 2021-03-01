@@ -72,6 +72,7 @@ function setupChannel(){
             (data) => {
                 console.log(data);
                 let conversation = data.eventBody;
+                let participants = conversation.participants;
                 let conversationId = conversation.id;
                 let agentParticipant = participants.find(
                     p => p.purpose == 'agent');
@@ -82,8 +83,7 @@ function setupChannel(){
                 if(agentParticipant.emails) return;
 
                 // If chat has ended display meeting has ended
-                if(conversationId == currentConversationId &&
-                         agentParticipant.endTime){
+                if(agentParticipant.endTime || agentParticipant.chats?.[0].state == 'disconnected'){
                     // Add OpenTok Session ID in conversation notes
                     let sessionId = getSessionId(conversationId);
                     
@@ -92,8 +92,9 @@ function setupChannel(){
                         .catch(e => console.error(e));
                     }
 
-                    view.showErrorIframe('No Active Interaction');
                     view.uncheckScreenShare();
+                    view.hideVonageSession();
+                    view.showErrorIframe('No Active Interaction');
                 }
             });
     });

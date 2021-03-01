@@ -25,6 +25,10 @@ module.exports = {
 
         // Required when sending invitation through email, 
         // the outbound email will go through this ACD queue. 
-        emailQueueID: ''
+        emailQueueID: '',
+
+        // Required when sending invitation through SMS
+        // This number should be purchased by the Genesys Cloud organization.
+        smsFromAddress: '', // eg +13175550000
     }
 }

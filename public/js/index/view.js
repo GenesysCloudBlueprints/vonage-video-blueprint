@@ -4,6 +4,11 @@ export default {
         iframe.src = `${appURI.replace(/\/+$/, '')}/room/agent/${conversationId}?username=${agentName}`
     },
 
+    hideVonageSession(){
+        let iframe = document.getElementById('conversation-iframe');
+        iframe.src = '';
+    },
+
     /**
      * Show the error page with the optional message
      * @param {String} message 
