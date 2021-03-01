@@ -103,6 +103,25 @@ The Vonage Video integration has the following stages:
 1. In the project directory, make a copy of the [sample-config.js](https://github.com/MyPureCloud/vonage-video-blueprint/blob/master/sample-config.js) file and rename it to **config.js**.
 2. Enter the values required in the file.
 
+### (Optional) Set up an Email Queue for email invitations
+
+If you want to send invitations to the Vonage Video Room via email, then a queue is required.
+For more information about queues and how to create them, read this [article](https://help.mypurecloud.com/articles/queues/).
+
+1. Once you have a queue, take note of the queue ID. It can be found using an [API query](https://developer.mypurecloud.com/api/rest/v2/routing/index.html) or if using the Genesys Cloud UI, in the URL.
+![1](images/queue_id.png "1")
+2. Enter the Queue ID into the config file.
+
+NOTE: Make sure that agents who access the interaction widget are also members of the queue.
+
+### (Optional) Purchase SMS number for SMS invitations
+
+If you want to send invitations to the Vonage Video Room via SMS, then a dedicated SMS number is required.
+
+For more details on purchasing SMS numbers, read this [article](https://help.mypurecloud.com/articles/purchase-sms-numbers/).
+
+1. Once you have a dedicated SMS number, enter the address into the config file.
+
 ### Run the NodeJS web server
 
 The project contains two NodeJS scripts:

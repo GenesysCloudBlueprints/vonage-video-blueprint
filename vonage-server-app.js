@@ -123,7 +123,7 @@ async function _sendSMS(body){
 }
 
 /**
- * Checks if token is expired and requests a new one
+ * Request new token for Genesys Cloud Client Credentials   
  */
 function _refreshGenesysCloudCredentials(){
     client.setEnvironment(config.genesysCloud.region);
