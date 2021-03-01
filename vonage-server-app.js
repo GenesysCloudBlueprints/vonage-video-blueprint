@@ -133,7 +133,6 @@ function _refreshGenesysCloudCredentials(){
         config.genesysCloud.clientSecret
     )
     .then((data) => {
-        console.log(data);
         tokenInfo = data;
         console.log(`Genesys Cloud authenticated. Token: ${tokenInfo.accessToken}`)
     })
