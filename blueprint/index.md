@@ -155,6 +155,18 @@ npm run start-server
 https://localhost/?conversationid={{pcConversationId}}&language={{pcLangTag}}&environment={{pcEnvironment}}
 ```
 
+In the Iframe Sandbox Options, enter the following:
+
+```
+allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads
+```
+
+In the Iframe Feature/Permissions Policy, enter the following:
+
+```
+camera,microphone,geolocation,clipboard-write,display-capture,fullscreen 
+```
+
 Select a group for filtering user access to the widget.
 
 Select specific queues for widget access.
