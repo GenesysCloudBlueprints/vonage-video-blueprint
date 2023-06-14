@@ -157,7 +157,7 @@ npm run start-server
 4. Click the **Configuration Tab**. If you're testing the project out of the box, type in the URL:
 
 ```
-https://localhost/?conversationid={{pcConversationId}}&language={{pcLangTag}}&environment={{pcEnvironment}}
+https://localhost/?conversationid={{gcConversationId}}&language={{gcLangTag}}&environment={{gcHostOrigin}}
 ```
 
 In the Iframe Sandbox Options, enter the following:
